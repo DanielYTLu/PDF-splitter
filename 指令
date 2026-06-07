@@ -1,0 +1,4 @@
+git status
+git add .
+git commit -m "這次修改的內容"
+git push
