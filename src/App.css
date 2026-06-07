@@ -1,0 +1,26 @@
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f5f7fa;
+}
+
+.header{
+  text-align:center;
+  padding:40px;
+}
+
+.upload-box{
+  border:2px dashed #999;
+  padding:40px;
+  margin:20px auto;
+  width:500px;
+  text-align:center;
+  background:white;
+}
+
+button{
+  padding:12px 24px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
