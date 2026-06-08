@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import usePDFTool from "../hooks/usePDFTool";
 import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
 import PDFViewer from "../components/PDFViewer";
@@ -9,10 +9,21 @@ import toast from "react-hot-toast";
 import Loading from "../components/Loading";
 
 export default function ReorderPDF() {
-  const [loading, setLoading] = useState(false);
-  const [pdfFile, setPdfFile] = useState(null);
+
   const [selectedPages, setSelectedPages] = useState([]);
-  const [error, setError] = useState(null);
+  const {
+  file: pdfFile,
+  setFile: setPdfFile,
+
+  loading,
+  setLoading,
+
+  error,
+  setError,
+
+  handleSuccess,
+  handleError,
+} = usePDFTool();
 
   const handleReorder = async () => {
     if (!pdfFile) {
@@ -30,10 +41,10 @@ export default function ReorderPDF() {
 
       await reorderPages(pdfFile, selectedPages);
 
-      toast.success("重新排序完成！");
+      handleSuccess("重新排序完成！");
     } catch (err) {
       console.error(err);
-      toast.error("處理失敗");
+      handleError(err, "處理失敗");
     } finally {
       setLoading(false);
     }

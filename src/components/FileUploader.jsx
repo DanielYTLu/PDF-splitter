@@ -1,9 +1,13 @@
 import Dropzone from "./Dropzone";
 import toast from "react-hot-toast";
 
-export default function FileUploader({ onFile }) {
+export default function FileUploader({
+  onFile,
+  multiple = false,
+}) {
   return (
     <Dropzone
+      multiple={multiple}
       onFile={(file) => {
         if (!file) {
           toast.error("請選擇 PDF");
@@ -12,7 +16,11 @@ export default function FileUploader({ onFile }) {
 
         onFile(file);
 
-        toast.success("上傳成功！");
+        toast.success(
+          multiple
+            ? "檔案已加入！"
+            : "上傳成功！"
+        );
       }}
     />
   );

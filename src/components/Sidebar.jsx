@@ -24,7 +24,7 @@ export default function Sidebar() {
       }}
     >
       <h2 style={{ marginBottom: 20 }}>
-        📄 PDF Tool Hub
+        📒 PDF Tool Hub
       </h2>
 
       {tools.map((tool) => {

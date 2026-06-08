@@ -1,17 +1,40 @@
 import { splitPDF } from "../utils/pdfSplitter";
 
-function PDFPreview({ pdfFile, selectedPages }) {
+export default function PDFPreview({
+  pdfFile,
+  selectedPages,
+  setSelectedPages,
+  setError,
+  onSuccess,
+}) {
+  const handleSplit = async () => {
+    try {
+      await splitPDF(pdfFile, selectedPages);
+
+      // callback 給 parent（SplitPDF）
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (err) {
+      console.error(err);
+
+      if (setError) {
+        setError("PDF 分割失敗");
+      }
+    }
+  };
+
   return (
     <div>
-      <h2>操作面板</h2>
+      <h3>操作面板</h3>
 
       <p>已選擇：{selectedPages.length} 頁</p>
 
       <button
-        onClick={() => splitPDF(pdfFile, selectedPages)}
+        onClick={handleSplit}
         style={{
-          width: "100%",
           padding: 12,
+          width: "100%",
           background: "#2563eb",
           color: "white",
           border: "none",
@@ -28,5 +51,3 @@ function PDFPreview({ pdfFile, selectedPages }) {
     </div>
   );
 }
-
-export default PDFPreview;

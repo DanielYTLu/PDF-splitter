@@ -76,7 +76,7 @@ function PDFViewer({ file, selectedPages, setSelectedPages, setError }) {
   };
 
   if (loading) {
-    return <div>📄 PDF 載入中...</div>;
+    return <div> PDF 載入中...</div>;
   }
 
   return (

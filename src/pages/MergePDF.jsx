@@ -21,11 +21,6 @@ import {
 export default function MergePDF() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const handleSelect = (e) => {
-    const newFiles = Array.from(e.target.files);
-
-    setFiles(newFiles);
-  };
 
   const handleDelete = (name) => {
     setFiles(
@@ -76,12 +71,22 @@ export default function MergePDF() {
 
   return (
     <Layout>
-      <h1>📚 PDF 合併</h1>
-      {loading && <Loading text="正在合併 PDF..." />}
-       <FileUploader
+      <h1> 📚PDF 合併</h1>
+      <FileUploader
   multiple
-  onFile={setFiles}
+  onFile={(newFiles) => {
+    setFiles((prev) => [
+      ...prev,
+      ...(Array.isArray(newFiles)
+        ? newFiles
+        : [newFiles]),
+    ]);
+  }}
 />
+      {loading && (
+  <Loading text="正在合併 PDF..." />
+)}
+      
       <br />
       <br />
 
@@ -106,19 +111,26 @@ export default function MergePDF() {
       </DndContext>
 
       {files.length > 0 && (
-        <button
+          <button
           onClick={handleMerge}
+          disabled={loading}
           style={{
             marginTop: 20,
             padding: 12,
-            background: "#4f46e5",
+            background: loading
+              ? "#a5b4fc"
+              : "#4f46e5",
             color: "white",
             border: "none",
             borderRadius: 8,
-            cursor: "pointer",
+            cursor: loading
+              ? "not-allowed"
+              : "pointer",
           }}
         >
-          合併 PDF
+          {loading
+            ? "處理中..."
+            : "合併 PDF"}
         </button>
       )}
     </Layout>

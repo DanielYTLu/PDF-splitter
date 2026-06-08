@@ -1,27 +1,56 @@
 import { useState } from "react";
-
+import usePDFTool from "../hooks/usePDFTool";
 import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
+import Loading from "../components/Loading";
+import toast from "react-hot-toast";
 
 import { compressPDF } from "../utils/compressPDF";
 
 export default function CompressPDF() {
-  const [file, setFile] = useState(null);
+  const {
+    file,
+    setFile,
+    loading,
+    setLoading,
+    handleSuccess,
+    handleError,
+  } = usePDFTool();
 
   const handleCompress = async () => {
-    if (!file) return;
+    if (!file) {
+      toast.error("請選擇 PDF");
+      return;
+    }
 
-    await compressPDF(file);
+    try {
+      setLoading(true);
+
+      await compressPDF(file);
+
+      handleSuccess("壓縮完成！");
+    } catch (err) {
+      handleError(err, "壓縮失敗");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Layout>
       <h1>🗜 PDF 壓縮</h1>
 
+      {loading && (
+        <Loading text="正在壓縮 PDF..." />
+      )}
+
       {!file && (
-       <FileUploader
-  onFile={setFile}
-/>
+        <FileUploader
+          onFile={(file) => {
+            setFile(file);
+            toast.success("上傳成功！");
+          }}
+        />
       )}
 
       {file && (
@@ -30,16 +59,24 @@ export default function CompressPDF() {
 
           <button
             onClick={handleCompress}
+            disabled={loading}
             style={{
               padding: 12,
-              background: "#16a34a",
+              background: loading
+                ? "#86efac"
+                : "#16a34a",
               color: "white",
               border: "none",
               borderRadius: 8,
               width: "100%",
+              cursor: loading
+                ? "not-allowed"
+                : "pointer",
             }}
           >
-            壓縮 PDF
+            {loading
+              ? "處理中..."
+              : "壓縮 PDF"}
           </button>
         </div>
       )}

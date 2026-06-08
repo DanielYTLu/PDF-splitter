@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <Layout>
     <div style={{ padding: 40 }}>
-      <h1>PDF Tool Hub</h1>
+      <h1>📒PDF Tool Hub</h1>
 
       <div
         style={{

@@ -1,5 +1,7 @@
 import { useState } from "react";
-
+import usePDFTool from "../hooks/usePDFTool";
+import toast from "react-hot-toast";
+import Loading from "../components/Loading";
 import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
 import PDFViewer from "../components/PDFViewer";
@@ -7,25 +9,52 @@ import PDFViewer from "../components/PDFViewer";
 import { deletePages } from "../utils/deletePages";
 
 export default function DeletePages() {
-  const [pdfFile, setPdfFile] = useState(null);
   const [selectedPages, setSelectedPages] = useState([]);
-  const [error, setError] = useState(null);
+
+const {
+  file: pdfFile,
+  setFile: setPdfFile,
+
+  loading,
+  setLoading,
+
+  error,
+  setError,
+
+  handleSuccess,
+  handleError,
+} = usePDFTool();
 
   const handleDelete = async () => {
-    if (!pdfFile) return;
+  if (!pdfFile) {
+    toast.error("請先上傳 PDF");
+    return;
+  }
 
-    if (!selectedPages.length) {
-      alert("請至少選擇要保留的頁面");
-      return;
-    }
+  if (!selectedPages.length) {
+    toast.error("請至少選擇要保留的頁面");
+    return;
+  }
+
+  try {
+    setLoading(true);
 
     await deletePages(pdfFile, selectedPages);
-  };
+
+    handleSuccess("PDF 已成功刪除頁面！");
+  } catch (err) {
+    handleError(err, "刪除頁面失敗");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Layout>
       <h1>🗑️ PDF 頁面刪除</h1>
-
+      {loading && (
+  <Loading text="正在刪除頁面..." />
+)}
       {error && (
         <div style={{ color: "red" }}>
           {error}
@@ -33,7 +62,12 @@ export default function DeletePages() {
       )}
 
       {!pdfFile && (
-        <FileUploader setFile={setPdfFile} />
+        <FileUploader
+  onFile={(file) => {
+    setPdfFile(file);
+    toast.success("上傳成功！");
+  }}
+/>
       )}
 
       {pdfFile && (
@@ -76,16 +110,21 @@ export default function DeletePages() {
 
             <button
               onClick={handleDelete}
+              disabled={loading}
               style={{
                 width: "100%",
                 padding: 12,
-                background: "#dc2626",
+                background: loading
+                  ? "#fca5a5"
+                  : "#dc2626",
                 color: "white",
                 border: "none",
                 borderRadius: 8,
               }}
             >
-              🗑️ 刪除未選取頁面
+             {loading
+                ? "處理中..."
+                : "🗑️ 刪除未選取頁面"}
             </button>
           </div>
         </div>

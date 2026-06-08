@@ -1,84 +1,119 @@
 import { useState } from "react";
+import usePDFTool from "../hooks/usePDFTool";
+import useResult from "../hooks/useResult";
 
-import Layout from "../components/Layout";
+import ToolLayout from "../components/ui/ToolLayout";
+import Card from "../components/ui/Card";
+
 import PDFViewer from "../components/PDFViewer";
 import PDFPreview from "../components/PDFPreview";
 import Dropzone from "../components/Dropzone";
+import EmptyState from "../components/EmptyState";
+import LoadingOverlay from "../components/LoadingOverlay";
+import ResultBox from "../components/ui/ResultBox";
+
+import { splitPDF } from "../utils/pdfSplitter";
+import { downloadBlob } from "../utils/downloadFile";
+
 import toast from "react-hot-toast";
 
 export default function SplitPDF() {
-  const [pdfFile, setPdfFile] = useState(null);
   const [selectedPages, setSelectedPages] = useState([]);
-  const [error, setError] = useState(null);
+
+  const {
+    file: pdfFile,
+    setFile: setPdfFile,
+    setError,
+  } = usePDFTool();
+
+  const {
+    result,
+    loading,
+    start,
+    success,
+    reset,
+  } = useResult();
+
+  const handleSplit = async () => {
+    if (!pdfFile) return toast.error("請先上傳 PDF");
+    if (!selectedPages.length) return toast.error("請選擇頁面");
+
+    try {
+      start();
+
+      const blob = await splitPDF(pdfFile, selectedPages);
+
+      success(blob);
+    } catch (err) {
+      console.error(err);
+      setError?.("PDF 分割失敗");
+    }
+  };
 
   return (
-    <Layout>
-      <h1>✂️ PDF 分割工具</h1>
-    
-      {error && (
-        <div
-          style={{
-            color: "red",
-            marginBottom: 20,
-          }}
-        >
-          {error}
-        </div>
-      )}
+    <ToolLayout
+      title=" ✂️PDF 分割"
+      description="快速選取 PDF 頁面並進行分割"
+    >
+      {/* LEFT */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <Card>
+          <Dropzone
+            onFile={(file) => {
+              if (!file) return;
 
-        <Dropzone
-        onFile={(file) => {
-            if (!file) {
-            toast.error("請選擇 PDF");
-            return;
-            }
-
-            setPdfFile(file);
-            toast.success("上傳成功！");
-        }}
-        />
-    
-      {pdfFile && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "3fr 1fr",
-            gap: 20,
-            marginTop: 20,
-          }}
-        >
-          {/* 左側 PDF 預覽 */}
-          <div
-            style={{
-              background: "white",
-              padding: 16,
-              borderRadius: 12,
+              setPdfFile(file);
+              toast.success("上傳成功！");
             }}
-          >
+          />
+        </Card>
+
+        {pdfFile && (
+          <Card>
             <PDFViewer
               file={pdfFile}
               selectedPages={selectedPages}
               setSelectedPages={setSelectedPages}
               setError={setError}
             />
-          </div>
+          </Card>
+        )}
+      </div>
 
-          {/* 右側工具面板 */}
-          <div
-            style={{
-              background: "white",
-              padding: 16,
-              borderRadius: 12,
-              height: "fit-content",
-            }}
-          >
+      {/* RIGHT */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {pdfFile && (
+          <Card>
             <PDFPreview
               pdfFile={pdfFile}
               selectedPages={selectedPages}
+              onSplit={handleSplit}
+              loading={loading}
             />
-          </div>
-        </div>
-      )}
-    </Layout>
+          </Card>
+        )}
+
+      
+
+        {loading && (
+          <LoadingOverlay text="正在處理 PDF..." />
+        )}
+
+        {result && (
+          <Card>
+            <ResultBox
+              title="PDF 分割完成"
+              description="你的檔案已成功處理"
+              onDownload={() => downloadBlob(result.data, "split.pdf")}
+              onReset={() => {
+                reset();
+                setPdfFile(null);
+                setSelectedPages([]);
+              }}
+            />
+          </Card>
+        )}
+      </div>
+    </ToolLayout>
   );
 }
