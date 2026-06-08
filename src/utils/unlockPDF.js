@@ -1,9 +1,11 @@
 import { PDFDocument } from "pdf-lib";
 
-export async function encryptPDF(file, password) {
+export async function unlockPDF(file, password) {
   const bytes = await file.arrayBuffer();
 
-  const pdfDoc = await PDFDocument.load(bytes);
+  const pdfDoc = await PDFDocument.load(bytes, {
+    password,
+  });
 
   const newPdf = await PDFDocument.create();
 
@@ -16,10 +18,6 @@ export async function encryptPDF(file, password) {
     newPdf.addPage(page)
   );
 
-  // ⚠️ 這裡是關鍵（偽加密）
-  newPdf.setTitle("Protected PDF");
-  newPdf.setSubject(`Password: ${password}`);
-
   const pdfBytes = await newPdf.save();
 
   const blob = new Blob([pdfBytes], {
@@ -30,7 +28,7 @@ export async function encryptPDF(file, password) {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "encrypted.pdf";
+  a.download = "unlocked.pdf";
   a.click();
 
   URL.revokeObjectURL(url);

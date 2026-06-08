@@ -5,31 +5,49 @@ export default function Sidebar() {
 
   const tools = [
     { name: "首頁", path: "/" },
-    { name: "PDF 分割", path: "/split" },
-    { name: "PDF 合併", path: "/merge" },
-    { name: "PDF 刪頁", path: "/delete-pages" },
-    { name: "PDF 排序", path: "/reorder" },
-    { name: "PDF 壓縮", path: "/compress" },
-    { name: "PDF 加密", path: "/encrypt" },
-    { name: "PDF 轉PNG", path: "/pdf-to-png" },
+
+    // PDF 編輯
+    { name: "PDF 分割", path: "/split-pdf" },
+    { name: "PDF 合併", path: "/merge-pdf" },
+    { name: "PDF 刪頁", path: "/delete-pages-pdf" },
+    { name: "PDF 排序", path: "/reorder-pdf" },
+    { name: "PDF 壓縮", path: "/compress-pdf" },
+    { name: "PDF 擷取頁面", path: "/extract-pdf" },
+
+    // 轉換
+    { name: "PDF 轉 PNG", path: "/pdf-to-png" },
+    { name: "圖片轉 PDF", path: "/image-to-pdf" },
+
+    // 安全
+    { name: "PDF 加密", path: "/encrypt-pdf" },
+    { name: "PDF 解鎖", path: "/unlock-pdf" },
+
+    // 增強
+    { name: "PDF 浮水印", path: "/watermark-pdf" },
+    { name: "Logo 浮水印", path: "/logo-watermark-pdf" },
+    { name: "PDF 頁碼", path: "/page-number-pdf" },
+    { name: "Header / Footer", path: "/header-footer-pdf" },
+    { name: "PDF Metadata", path: "/metadata-pdf" },
   ];
 
   return (
     <div
       style={{
-        width: 240,
+        width: 260,
         background: "white",
         borderRight: "1px solid #e5e7eb",
         padding: 16,
+        height: "100vh",
+        position: "sticky",
+        top: 0,
       }}
     >
-      <h2 style={{ marginBottom: 20 }}>
-        📒 PDF Tool Hub
+      <h2 style={{ marginBottom: 20, fontSize: 18 }}>
+        📒 PDF Workspace
       </h2>
 
       {tools.map((tool) => {
-        const active =
-          location.pathname === tool.path;
+        const active = location.pathname === tool.path;
 
         return (
           <Link
@@ -37,14 +55,15 @@ export default function Sidebar() {
             to={tool.path}
             style={{
               display: "block",
-              padding: 10,
+              padding: "10px 12px",
               marginBottom: 6,
               borderRadius: 8,
               textDecoration: "none",
-              color: active ? "white" : "#333",
-              background: active
-                ? "#4f46e5"
-                : "transparent",
+              fontSize: 14,
+              fontWeight: 500,
+              color: active ? "white" : "#374151",
+              background: active ? "#4f46e5" : "transparent",
+              transition: "0.2s",
             }}
           >
             {tool.name}
