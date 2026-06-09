@@ -1,15 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-
-import { Toaster } from "react-hot-toast";
+import { BrowserRouter } from "react-router-dom";
+import { WorkspaceProvider } from "./context/WorkspaceContext";
+import { WorkflowProvider } from "./context/WorkflowContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+<WorkspaceProvider>
+  <WorkflowProvider>
     <BrowserRouter>
       <App />
-      <Toaster position="top-right" />
     </BrowserRouter>
-  </React.StrictMode>
+  </WorkflowProvider>
+</WorkspaceProvider>
 );

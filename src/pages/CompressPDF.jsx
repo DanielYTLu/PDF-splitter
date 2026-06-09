@@ -1,6 +1,5 @@
 import { useState } from "react";
 import usePDFTool from "../hooks/usePDFTool";
-import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
 import Loading from "../components/Loading";
 import toast from "react-hot-toast";
@@ -37,49 +36,62 @@ export default function CompressPDF() {
   };
 
   return (
-    <Layout>
-      <h1>🗜 PDF 壓縮</h1>
+    <div>
+      {/* Title */}
+      <h1>
+        🗜 PDF 壓縮
+      </h1>
 
-      {loading && (
-        <Loading text="正在壓縮 PDF..." />
-      )}
+      {loading && <Loading text="正在壓縮 PDF..." />}
 
       {!file && (
-        <FileUploader
-          onFile={(file) => {
-            setFile(file);
-            toast.success("上傳成功！");
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            marginBottom: 20,
           }}
-        />
+        >
+          <FileUploader
+            onFile={(file) => {
+              setFile(file);
+              toast.success("上傳成功！");
+            }}
+          />
+        </div>
       )}
 
       {file && (
-        <div style={{ marginTop: 20 }}>
-          <p>已選擇：{file.name}</p>
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <p style={{ fontWeight: 600 }}>已選擇：{file.name}</p>
 
           <button
             onClick={handleCompress}
             disabled={loading}
             style={{
               padding: 12,
-              background: loading
-                ? "#86efac"
-                : "#16a34a",
+              background: loading ? "#86efac" : "#16a34a",
               color: "white",
               border: "none",
               borderRadius: 8,
               width: "100%",
-              cursor: loading
-                ? "not-allowed"
-                : "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontWeight: 600,
             }}
           >
-            {loading
-              ? "處理中..."
-              : "壓縮 PDF"}
+            {loading ? "處理中..." : "壓縮 PDF"}
           </button>
         </div>
       )}
-    </Layout>
+    </div>
   );
 }

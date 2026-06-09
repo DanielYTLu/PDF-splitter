@@ -5,40 +5,55 @@ export default function ToolCard({ tool, onClick }) {
     <Link to={tool.path} onClick={onClick} style={{ textDecoration: "none" }}>
       <div className="tool-card">
 
-        {/* ICON */}
-        <div style={{
-          width: 44,
-          height: 44,
-          borderRadius: 12,
-          background: "#eff6ff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 20
-        }}>
-          {tool.icon}
-        </div>
+  <div
+    style={{
+      width: 60,
+      height: 60,
+      borderRadius: 16,
+      background:
+        "linear-gradient(135deg,#eff6ff,#dbeafe)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 30,
+      marginBottom: 16,
+    }}
+  >
+    {tool.icon}
+  </div>
 
-        {/* TITLE */}
-        <h3 style={{
-          marginTop: 12,
-          fontWeight: 700,
-          fontSize: 16,
-          color: "#111827"
-        }}>
-          {tool.title}
-        </h3>
+  <h3
+    style={{
+      margin: 0,
+      fontSize: 18,
+      color: "#111827",
+    }}
+  >
+    {tool.title}
+  </h3>
 
-        {/* CATEGORY */}
-        <p style={{
-          marginTop: 6,
-          fontSize: 12,
-          color: "#6b7280"
-        }}>
-          {tool.category}
-        </p>
+  <p
+    style={{
+      color: "#6b7280",
+      fontSize: 13,
+      marginTop: 8,
+    }}
+  >
+    {tool.category}
+  </p>
 
-      </div>
+  <div
+    style={{
+      marginTop: 20,
+      color: "#2563eb",
+      fontSize: 13,
+      fontWeight: 600,
+    }}
+  >
+    Open Tool →
+  </div>
+
+</div>
     </Link>
   );
 }

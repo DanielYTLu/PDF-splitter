@@ -1,11 +1,7 @@
 import { useState } from "react";
-
-import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
 import Loading from "../components/Loading";
-
 import { pageNumberPDF } from "../utils/pageNumberPDF";
-
 import toast from "react-hot-toast";
 
 export default function PageNumberPDF() {
@@ -22,10 +18,7 @@ export default function PageNumberPDF() {
     try {
       setLoading(true);
 
-      await pageNumberPDF(
-        file,
-        position
-      );
+      await pageNumberPDF(file, position);
 
       toast.success("頁碼新增完成！");
     } catch (err) {
@@ -37,49 +30,47 @@ export default function PageNumberPDF() {
   };
 
   return (
-    <Layout>
-      <h1>📄 PDF 頁碼</h1>
+    <div>
+      {/* Title */}
+      <h1 >
+        📄 PDF 頁碼
+      </h1>
 
-      {loading && (
-        <Loading text="正在加入頁碼..." />
-      )}
+      {loading && <Loading text="正在加入頁碼..." />}
 
       {!file && (
-        <FileUploader
-          onFile={(file) => {
-            setFile(file);
-            toast.success("上傳成功！");
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            marginBottom: 20,
           }}
-        />
+        >
+          <FileUploader
+            onFile={(file) => {
+              setFile(file);
+              toast.success("上傳成功！");
+            }}
+          />
+        </div>
       )}
 
       {file && (
         <div
           style={{
-            marginTop: 20,
             background: "white",
             padding: 20,
             borderRadius: 12,
-            boxShadow:
-              "0 2px 8px rgba(0,0,0,0.05)",
+            border: "1px solid #e5e7eb",
           }}
         >
-          <p
-            style={{
-              fontWeight: 600,
-              marginBottom: 16,
-            }}
-          >
+          <p style={{ fontWeight: 600, marginBottom: 16 }}>
             📄 {file.name}
           </p>
 
-          <h3
-            style={{
-              marginBottom: 12,
-            }}
-          >
-            頁碼位置
-          </h3>
+          <h3 style={{ marginBottom: 12 }}>頁碼位置</h3>
 
           <div
             style={{
@@ -93,14 +84,8 @@ export default function PageNumberPDF() {
               <input
                 type="radio"
                 value="left"
-                checked={
-                  position === "left"
-                }
-                onChange={(e) =>
-                  setPosition(
-                    e.target.value
-                  )
-                }
+                checked={position === "left"}
+                onChange={(e) => setPosition(e.target.value)}
               />{" "}
               左下角
             </label>
@@ -109,14 +94,8 @@ export default function PageNumberPDF() {
               <input
                 type="radio"
                 value="center"
-                checked={
-                  position === "center"
-                }
-                onChange={(e) =>
-                  setPosition(
-                    e.target.value
-                  )
-                }
+                checked={position === "center"}
+                onChange={(e) => setPosition(e.target.value)}
               />{" "}
               中下方
             </label>
@@ -125,14 +104,8 @@ export default function PageNumberPDF() {
               <input
                 type="radio"
                 value="right"
-                checked={
-                  position === "right"
-                }
-                onChange={(e) =>
-                  setPosition(
-                    e.target.value
-                  )
-                }
+                checked={position === "right"}
+                onChange={(e) => setPosition(e.target.value)}
               />{" "}
               右下角
             </label>
@@ -146,22 +119,16 @@ export default function PageNumberPDF() {
               padding: 12,
               border: "none",
               borderRadius: 10,
-              background: loading
-                ? "#93c5fd"
-                : "#2563eb",
+              background: loading ? "#93c5fd" : "#2563eb",
               color: "white",
               fontWeight: 600,
-              cursor: loading
-                ? "not-allowed"
-                : "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
             }}
           >
-            {loading
-              ? "處理中..."
-              : "📄 新增頁碼"}
+            {loading ? "處理中..." : "📄 新增頁碼"}
           </button>
         </div>
       )}
-    </Layout>
+    </div>
   );
 }

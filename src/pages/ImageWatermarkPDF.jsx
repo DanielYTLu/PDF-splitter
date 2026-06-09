@@ -1,154 +1,126 @@
 import { useState } from "react";
-
-import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
 import Loading from "../components/Loading";
-
-import { imageWatermarkPDF }
-  from "../utils/imageWatermarkPDF";
-
+import { imageWatermarkPDF } from "../utils/imageWatermarkPDF";
 import toast from "react-hot-toast";
 
 export default function ImageWatermarkPDF() {
-  const [pdfFile, setPdfFile] =
-    useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [opacity, setOpacity] = useState(0.3);
+  const [loading, setLoading] = useState(false);
 
-  const [imageFile, setImageFile] =
-    useState(null);
+  const handleProcess = async () => {
+    if (!pdfFile) return toast.error("請上傳 PDF");
+    if (!imageFile) return toast.error("請上傳圖片");
 
-  const [opacity, setOpacity] =
-    useState(0.3);
+    try {
+      setLoading(true);
 
-  const [loading, setLoading] =
-    useState(false);
+      await imageWatermarkPDF(pdfFile, imageFile, opacity);
 
-  const handleProcess =
-    async () => {
-      if (!pdfFile)
-        return toast.error(
-          "請上傳 PDF"
-        );
-
-      if (!imageFile)
-        return toast.error(
-          "請上傳圖片"
-        );
-
-      try {
-        setLoading(true);
-
-        await imageWatermarkPDF(
-          pdfFile,
-          imageFile,
-          opacity
-        );
-
-        toast.success(
-          "浮水印完成！"
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error(
-          "處理失敗"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+      toast.success("浮水印完成！");
+    } catch (err) {
+      console.error(err);
+      toast.error("處理失敗");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Layout>
-      <h1>
+    <div>
+      {/* Title */}
+      <h1 >
         🖼️ Logo 浮水印
       </h1>
 
-      {loading && (
-        <Loading text="正在加入 Logo..." />
-      )}
+      {loading && <Loading text="正在加入 Logo..." />}
 
       {!pdfFile && (
-        <>
-          <h3>上傳 PDF</h3>
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            marginBottom: 20,
+          }}
+        >
+          <h3 style={{ marginBottom: 10 }}>上傳 PDF</h3>
 
           <FileUploader
             onFile={(file) => {
               setPdfFile(file);
-              toast.success(
-                "PDF 上傳成功"
-              );
+              toast.success("PDF 上傳成功");
             }}
           />
-        </>
+        </div>
       )}
 
       {pdfFile && !imageFile && (
-        <>
-          <h3>
-            上傳 Logo
-          </h3>
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            marginBottom: 20,
+          }}
+        >
+          <h3 style={{ marginBottom: 10 }}>上傳 Logo</h3>
 
           <FileUploader
             accept="image/*"
             onFile={(file) => {
               setImageFile(file);
-              toast.success(
-                "圖片上傳成功"
-              );
+              toast.success("圖片上傳成功");
             }}
           />
-        </>
+        </div>
       )}
 
-      {pdfFile &&
-        imageFile && (
-          <div
+      {pdfFile && imageFile && (
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <label style={{ fontWeight: 600 }}>
+            透明度：{opacity}
+          </label>
+
+          <input
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.1"
+            value={opacity}
+            onChange={(e) => setOpacity(Number(e.target.value))}
+            style={{ width: "100%", marginTop: 10 }}
+          />
+
+          <button
+            onClick={handleProcess}
             style={{
+              width: "100%",
               marginTop: 20,
+              padding: 12,
+              border: "none",
+              borderRadius: 8,
+              background: "#2563eb",
+              color: "white",
+              fontWeight: 600,
+              cursor: "pointer",
             }}
           >
-            <label>
-              透明度：
-              {opacity}
-            </label>
-
-            <input
-              type="range"
-              min="0.1"
-              max="1"
-              step="0.1"
-              value={opacity}
-              onChange={(e) =>
-                setOpacity(
-                  Number(
-                    e.target.value
-                  )
-                )
-              }
-              style={{
-                width: "100%",
-              }}
-            />
-
-            <button
-              onClick={
-                handleProcess
-              }
-              style={{
-                width: "100%",
-                marginTop: 20,
-                padding: 12,
-                border: "none",
-                borderRadius: 8,
-                background:
-                  "#2563eb",
-                color:
-                  "white",
-              }}
-            >
-              🖼️ 加入 Logo
-            </button>
-          </div>
-        )}
-    </Layout>
+            🖼️ 加入 Logo
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

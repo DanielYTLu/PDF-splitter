@@ -1,6 +1,5 @@
 import { useState } from "react";
 import usePDFTool from "../hooks/usePDFTool";
-import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
 import Loading from "../components/Loading";
 import toast from "react-hot-toast";
@@ -44,33 +43,49 @@ export default function EncryptPDF() {
   };
 
   return (
-    <Layout>
-      <h1>🔒 PDF 加密</h1>
+    <div>
+      {/* Title */}
+      <h1 >
+        🔒 PDF 加密
+      </h1>
 
-      {loading && (
-        <Loading text="正在加密 PDF..." />
-      )}
+      {loading && <Loading text="正在加密 PDF..." />}
 
       {!file && (
-        <FileUploader
-          onFile={(file) => {
-            setFile(file);
-            toast.success("上傳成功！");
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            marginBottom: 20,
           }}
-        />
+        >
+          <FileUploader
+            onFile={(file) => {
+              setFile(file);
+              toast.success("上傳成功！");
+            }}
+          />
+        </div>
       )}
 
       {file && (
-        <div style={{ marginTop: 20 }}>
-          <p>{file.name}</p>
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <p style={{ fontWeight: 600 }}>{file.name}</p>
 
           <input
             type="password"
             placeholder="輸入密碼"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
             style={{
               width: "100%",
               padding: 10,
@@ -87,23 +102,18 @@ export default function EncryptPDF() {
               marginTop: 10,
               padding: 12,
               width: "100%",
-              background: loading
-                ? "#fca5a5"
-                : "#dc2626",
+              background: loading ? "#fca5a5" : "#dc2626",
               color: "white",
               border: "none",
               borderRadius: 8,
-              cursor: loading
-                ? "not-allowed"
-                : "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontWeight: 600,
             }}
           >
-            {loading
-              ? "處理中..."
-              : "加密 PDF"}
+            {loading ? "處理中..." : "加密 PDF"}
           </button>
         </div>
       )}
-    </Layout>
+    </div>
   );
 }

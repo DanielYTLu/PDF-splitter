@@ -1,11 +1,7 @@
 import { useState } from "react";
-
-import Layout from "../components/Layout";
 import Card from "../components/ui/Card";
 import FileUploader from "../components/FileUploader";
-
 import { unlockPDF } from "../utils/unlockPDF";
-
 import toast from "react-hot-toast";
 
 export default function UnlockPDF() {
@@ -19,9 +15,7 @@ export default function UnlockPDF() {
 
     try {
       setLoading(true);
-
       await unlockPDF(file, password);
-
       toast.success("解鎖成功！");
     } catch (err) {
       console.error(err);
@@ -32,9 +26,11 @@ export default function UnlockPDF() {
   };
 
   return (
-    <Layout>
-      <h1>🔓 PDF 解鎖</h1>
+    <div>
+      {/* Title */}
+      <h1>🔓 PDF 解鎖 </h1>
 
+      {/* Upload */}
       <Card>
         <FileUploader
           onFile={(file) => {
@@ -44,44 +40,41 @@ export default function UnlockPDF() {
         />
       </Card>
 
-      <Card>
-        <input
-          type="password"
-          placeholder="輸入 PDF 密碼"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          style={{
-            width: "100%",
-            padding: 12,
-            borderRadius: 8,
-            border: "1px solid #ddd",
-            marginBottom: 12,
-          }}
-        />
+      {/* Password + Action */}
+      {file && (
+        <Card>
+          <input
+            type="password"
+            placeholder="輸入 PDF 密碼"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              width: "100%",
+              padding: 12,
+              borderRadius: 8,
+              border: "1px solid #ddd",
+              marginBottom: 12,
+            }}
+          />
 
-        <button
-          onClick={handleUnlock}
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: 12,
-            borderRadius: 8,
-            border: "none",
-            background: loading
-              ? "#a5b4fc"
-              : "#4f46e5",
-            color: "white",
-            fontWeight: 600,
-            cursor: loading
-              ? "not-allowed"
-              : "pointer",
-          }}
-        >
-          {loading ? "處理中..." : "🔓 解鎖 PDF"}
-        </button>
-      </Card>
-    </Layout>
+          <button
+            onClick={handleUnlock}
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: 12,
+              borderRadius: 8,
+              border: "none",
+              background: loading ? "#a5b4fc" : "#4f46e5",
+              color: "white",
+              fontWeight: 600,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "處理中..." : "🔓 解鎖 PDF"}
+          </button>
+        </Card>
+      )}
+    </div>
   );
 }

@@ -1,16 +1,12 @@
 import { useState } from "react";
 
-import Layout from "../components/Layout";
 import FileCard from "../components/FileCard";
-
 import { mergePDF } from "../utils/pdfMerger";
 import FileUploader from "../components/FileUploader";
 import toast from "react-hot-toast";
 import Loading from "../components/Loading";
-import {
-  DndContext,
-  closestCenter,
-} from "@dnd-kit/core";
+
+import { DndContext, closestCenter } from "@dnd-kit/core";
 
 import {
   SortableContext,
@@ -23,72 +19,56 @@ export default function MergePDF() {
   const [loading, setLoading] = useState(false);
 
   const handleDelete = (name) => {
-    setFiles(
-      files.filter((f) => f.name !== name)
-    );
+    setFiles(files.filter((f) => f.name !== name));
   };
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-
     if (!over) return;
 
     if (active.id !== over.id) {
-      const oldIndex = files.findIndex(
-        (f) => f.name === active.id
-      );
+      const oldIndex = files.findIndex((f) => f.name === active.id);
+      const newIndex = files.findIndex((f) => f.name === over.id);
 
-      const newIndex = files.findIndex(
-        (f) => f.name === over.id
-      );
-
-      setFiles(
-        arrayMove(files, oldIndex, newIndex)
-      );
+      setFiles(arrayMove(files, oldIndex, newIndex));
     }
   };
 
   const handleMerge = async () => {
-    console.log("FILES:", files);
-  if (files.length < 2) {
-    toast.error("請至少選擇兩個 PDF");
-    return;
-  }
+    if (files.length < 2) {
+      toast.error("請至少選擇兩個 PDF");
+      return;
+    }
 
-  try {
-    setLoading(true);
-
-    await mergePDF(files);
-
-    toast.success("合併完成！");
-  } catch (err) {
-    console.error(err);
-    toast.error("合併失敗");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      await mergePDF(files);
+      toast.success("合併完成！");
+    } catch (err) {
+      console.error(err);
+      toast.error("合併失敗");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Layout>
-      <h1> 📚PDF 合併</h1>
+    <div>
+      <h1>📚 PDF 合併</h1>
+
       <FileUploader
-  multiple
-  onFile={(newFiles) => {
-    setFiles((prev) => [
-      ...prev,
-      ...(Array.isArray(newFiles)
-        ? newFiles
-        : [newFiles]),
-    ]);
-  }}
-/>
-      {loading && (
-  <Loading text="正在合併 PDF..." />
-)}
-      
-      <br />
-      <br />
+        multiple
+        onFile={(newFiles) => {
+          setFiles((prev) => [
+            ...prev,
+            ...(Array.isArray(newFiles) ? newFiles : [newFiles]),
+          ]);
+        }}
+      />
+
+      {loading && <Loading />}
+
+      <br /><br />
 
       <DndContext
         collisionDetection={closestCenter}
@@ -96,9 +76,7 @@ export default function MergePDF() {
       >
         <SortableContext
           items={files.map((f) => f.name)}
-          strategy={
-            verticalListSortingStrategy
-          }
+          strategy={verticalListSortingStrategy}
         >
           {files.map((file) => (
             <FileCard
@@ -111,28 +89,22 @@ export default function MergePDF() {
       </DndContext>
 
       {files.length > 0 && (
-          <button
+        <button
           onClick={handleMerge}
           disabled={loading}
           style={{
             marginTop: 20,
             padding: 12,
-            background: loading
-              ? "#a5b4fc"
-              : "#4f46e5",
+            background: loading ? "#a5b4fc" : "#4f46e5",
             color: "white",
             border: "none",
             borderRadius: 8,
-            cursor: loading
-              ? "not-allowed"
-              : "pointer",
+            cursor: loading ? "not-allowed" : "pointer",
           }}
         >
-          {loading
-            ? "處理中..."
-            : "合併 PDF"}
+          {loading ? "處理中..." : "合併 PDF"}
         </button>
       )}
-    </Layout>
+    </div>
   );
 }

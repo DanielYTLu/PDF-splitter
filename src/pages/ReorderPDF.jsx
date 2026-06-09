@@ -1,29 +1,24 @@
 import { useState } from "react";
 import usePDFTool from "../hooks/usePDFTool";
-import Layout from "../components/Layout";
 import FileUploader from "../components/FileUploader";
 import PDFViewer from "../components/PDFViewer";
-
 import { reorderPages } from "../utils/reorderPages";
 import toast from "react-hot-toast";
 import Loading from "../components/Loading";
 
 export default function ReorderPDF() {
-
   const [selectedPages, setSelectedPages] = useState([]);
+
   const {
-  file: pdfFile,
-  setFile: setPdfFile,
-
-  loading,
-  setLoading,
-
-  error,
-  setError,
-
-  handleSuccess,
-  handleError,
-} = usePDFTool();
+    file: pdfFile,
+    setFile: setPdfFile,
+    loading,
+    setLoading,
+    error,
+    setError,
+    handleSuccess,
+    handleError,
+  } = usePDFTool();
 
   const handleReorder = async () => {
     if (!pdfFile) {
@@ -51,22 +46,37 @@ export default function ReorderPDF() {
   };
 
   return (
-    <Layout>
-      <h1>🔀 PDF 頁面重新排序</h1>
+    <div>
+      {/* Title */}
+      <h1>
+        🔀 PDF 頁面重新排序
+      </h1>
 
       {loading && <Loading text="正在重新排序 PDF..." />}
 
       {error && (
-        <div style={{ color: "red" }}>{error}</div>
+        <div style={{ color: "red", marginBottom: 10 }}>
+          {error}
+        </div>
       )}
 
       {!pdfFile && (
-        <FileUploader
-          onFile={(file) => {
-            setPdfFile(file);
-            toast.success("上傳成功！");
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            marginBottom: 20,
           }}
-        />
+        >
+          <FileUploader
+            onFile={(file) => {
+              setPdfFile(file);
+              toast.success("上傳成功！");
+            }}
+          />
+        </div>
       )}
 
       {pdfFile && (
@@ -83,6 +93,7 @@ export default function ReorderPDF() {
               background: "white",
               padding: 16,
               borderRadius: 12,
+              border: "1px solid #e5e7eb",
             }}
           >
             <PDFViewer
@@ -99,9 +110,10 @@ export default function ReorderPDF() {
               background: "white",
               padding: 16,
               borderRadius: 12,
+              border: "1px solid #e5e7eb",
             }}
           >
-            <h3>排序控制</h3>
+            <h3 style={{ marginTop: 0 }}>排序控制</h3>
 
             <p>
               已選順序：{selectedPages.join(" → ")}
@@ -117,9 +129,8 @@ export default function ReorderPDF() {
                 color: "white",
                 border: "none",
                 borderRadius: 8,
-                cursor: loading
-                  ? "not-allowed"
-                  : "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontWeight: 600,
               }}
             >
               {loading ? "處理中..." : "🔀 重新輸出 PDF"}
@@ -127,6 +138,6 @@ export default function ReorderPDF() {
           </div>
         </div>
       )}
-    </Layout>
+    </div>
   );
 }
