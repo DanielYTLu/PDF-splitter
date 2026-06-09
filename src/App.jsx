@@ -19,12 +19,12 @@ import ImageWatermarkPDF from "./pages/ImageWatermarkPDF";
 import PageNumberPDF from "./pages/PageNumberPDF";
 import HeaderFooterPDF from "./pages/HeaderFooterPDF";
 import MetadataPDF from "./pages/MetadataPDF";
+import Workflow from "./pages/Workflow";
 
 function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-
         <Route path="/" element={<Home />} />
 
         <Route path="/split-pdf" element={<SplitPDF />} />
@@ -47,6 +47,7 @@ function App() {
         <Route path="/header-footer-pdf" element={<HeaderFooterPDF />} />
         <Route path="/metadata-pdf" element={<MetadataPDF />} />
 
+        <Route path="/workflow" element={<Workflow />} />
       </Route>
     </Routes>
   );

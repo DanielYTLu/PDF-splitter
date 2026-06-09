@@ -42,7 +42,7 @@ export default function Sidebar() {
       {/* MAIN */}
       <div style={styles.sectionTitleSmall}>工具</div>
 
-      <SidebarItem to="/" label="儀表板" icon="🏠" collapsed={collapsed} />
+      <SidebarItem to="/" label="首頁" icon="🏠" collapsed={collapsed} />
 
       <SidebarItem to="/split-pdf" label="PDF分割" icon="✂️" collapsed={collapsed} />
       <SidebarItem to="/merge-pdf" label="PDF合併" icon="🧩" collapsed={collapsed} />

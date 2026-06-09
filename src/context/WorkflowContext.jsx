@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { runWorkflowV2 } from "./WorkflowEngine";
 
 const WorkflowContext = createContext();
 
@@ -11,40 +12,19 @@ export function WorkflowProvider({ children }) {
     setSteps((prev) => [...prev, step]);
   };
 
-  const removeStep = (index) => {
-    setSteps((prev) => prev.filter((_, i) => i !== index));
-  };
+  const clearSteps = () => setSteps([]);
 
-  const clearSteps = () => {
-    setSteps([]);
-    setResult(null);
-  };
-
-  // 🚀 核心執行器
   const runWorkflow = async (initialInput) => {
     setRunning(true);
 
-    let data = initialInput;
-    const logs = [];
+    try {
+      const res = await runWorkflowV2(steps, initialInput);
 
-    for (const step of steps) {
-      const output = await step.run(data);
-
-      logs.push({
-        step: step.label,
-        input: data,
-        output,
-      });
-
-      data = output;
+      setResult(res);
+      return res;
+    } finally {
+      setRunning(false);
     }
-
-    setResult({
-      final: data,
-      logs,
-    });
-
-    setRunning(false);
   };
 
   return (
@@ -52,7 +32,6 @@ export function WorkflowProvider({ children }) {
       value={{
         steps,
         addStep,
-        removeStep,
         clearSteps,
         runWorkflow,
         running,
@@ -64,6 +43,4 @@ export function WorkflowProvider({ children }) {
   );
 }
 
-export function useWorkflow() {
-  return useContext(WorkflowContext);
-}
+export const useWorkflow = () => useContext(WorkflowContext);

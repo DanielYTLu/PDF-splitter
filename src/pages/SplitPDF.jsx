@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import usePDFTool from "../hooks/usePDFTool";
 import useResult from "../hooks/useResult";
 
@@ -8,16 +9,16 @@ import Card from "../components/ui/Card";
 import PDFViewer from "../components/PDFViewer";
 import PDFPreview from "../components/PDFPreview";
 import Dropzone from "../components/Dropzone";
-import EmptyState from "../components/EmptyState";
 import LoadingOverlay from "../components/LoadingOverlay";
 import ResultBox from "../components/ui/ResultBox";
 
-import { splitPDF } from "../utils/pdfSplitter";
-import { downloadBlob } from "../utils/downloadFile";
-
-import { useWorkflow } from "../context/WorkflowContext";
+import EmptyState from "../components/EmptyState";
 
 import toast from "react-hot-toast";
+
+import { useWorkflow } from "../context/WorkflowContext";
+import { getTool } from "../tools";
+import { downloadBlob } from "../utils/downloadFile";
 
 export default function SplitPDF() {
   const [selectedPages, setSelectedPages] = useState([]);
@@ -32,8 +33,10 @@ export default function SplitPDF() {
 
   const { result, loading, start, success, reset } = useResult();
 
+  const splitTool = getTool("split");
+
   // =========================
-  // ⚡ Mode 1：直接執行（iLovePDF）
+  // ⚡ Direct Mode
   // =========================
   const handleDirectSplit = async () => {
     if (!pdfFile) return toast.error("請先上傳 PDF");
@@ -42,9 +45,12 @@ export default function SplitPDF() {
     try {
       start();
 
-      const blob = await splitPDF(pdfFile, selectedPages);
+      const blob = await splitTool.runDirect({
+        file: pdfFile,
+        pages: selectedPages,
+      });
 
-      success(blob);
+      success({ data: blob });
 
       toast.success("PDF 分割完成");
     } catch (err) {
@@ -55,7 +61,7 @@ export default function SplitPDF() {
   };
 
   // =========================
-  // 🔗 Mode 2：加入 Workflow
+  // 🔗 Workflow Mode
   // =========================
   const handleAddWorkflow = () => {
     if (!pdfFile) return toast.error("請先上傳 PDF");
@@ -66,16 +72,13 @@ export default function SplitPDF() {
       label: "PDF 分割",
 
       run: async (input) => {
-        console.log("Workflow Split running:", input);
-
-        // 👉 真正 workflow 邏輯（之後可接 splitPDF util）
-        const blob = await splitPDF(
-          input?.file || pdfFile,
-          selectedPages
-        );
+        const blob = await splitTool.run({
+          file: input?.file || pdfFile,
+          pages: selectedPages,
+        });
 
         return {
-          data: blob,
+          data: blob.data || blob,
           pages: selectedPages,
           source: "workflow",
         };
@@ -87,23 +90,19 @@ export default function SplitPDF() {
 
   return (
     <ToolLayout>
-
-      {/* LEFT SIDE */}
+      {/* LEFT */}
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-        {/* Upload */}
         <Card>
           <Dropzone
             onFile={(file) => {
               if (!file) return;
-
               setPdfFile(file);
               toast.success("上傳成功！");
+              window.__TEST_FILE = file;
             }}
           />
         </Card>
 
-        {/* Viewer */}
         {pdfFile && (
           <Card>
             <PDFViewer
@@ -114,13 +113,10 @@ export default function SplitPDF() {
             />
           </Card>
         )}
-
       </div>
 
-      {/* RIGHT SIDE */}
+      {/* RIGHT */}
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-        {/* Preview + Actions */}
         {pdfFile && (
           <Card>
             <PDFPreview
@@ -130,14 +126,16 @@ export default function SplitPDF() {
               loading={loading}
             />
 
-            {/* 🆕 Dual Mode Buttons */}
-            <div style={styles.actions}>
+            <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
               <button
                 onClick={handleDirectSplit}
                 disabled={loading}
                 style={{
-                  ...styles.button,
+                  padding: 12,
                   background: "#0ea5e9",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 8,
                 }}
               >
                 ⚡ 直接分割
@@ -146,8 +144,11 @@ export default function SplitPDF() {
               <button
                 onClick={handleAddWorkflow}
                 style={{
-                  ...styles.button,
+                  padding: 12,
                   background: "#4f46e5",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 8,
                 }}
               >
                 🔗 加入 Workflow
@@ -156,52 +157,19 @@ export default function SplitPDF() {
           </Card>
         )}
 
-        {/* Loading */}
-        {loading && (
-          <LoadingOverlay text="正在處理 PDF..." />
-        )}
+        {loading && <LoadingOverlay text="處理中..." />}
 
-        {/* Result */}
         {result && (
           <Card>
             <ResultBox
               title="PDF 分割完成"
               description="你的檔案已成功處理"
-              onDownload={() =>
-                downloadBlob(result.data, "split.pdf")
-              }
-              onReset={() => {
-                reset();
-                setPdfFile(null);
-                setSelectedPages([]);
-              }}
+              onDownload={() => downloadBlob(result.data, "split.pdf")}
+              onReset={reset}
             />
           </Card>
         )}
-
       </div>
     </ToolLayout>
   );
 }
-
-// =========================
-// styles
-// =========================
-
-const styles = {
-  actions: {
-    marginTop: 12,
-    display: "flex",
-    gap: 12,
-  },
-
-  button: {
-    padding: "12px 18px",
-    borderRadius: 12,
-    border: "none",
-    color: "white",
-    fontWeight: 700,
-    cursor: "pointer",
-    width: "fit-content",
-  },
-};
