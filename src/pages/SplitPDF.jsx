@@ -6,13 +6,10 @@ import useResult from "../hooks/useResult";
 import ToolLayout from "../components/ui/ToolLayout";
 import Card from "../components/ui/Card";
 
-import PDFViewer from "../components/PDFViewer";
 import PDFPreview from "../components/PDFPreview";
 import Dropzone from "../components/Dropzone";
 import LoadingOverlay from "../components/LoadingOverlay";
 import ResultBox from "../components/ui/ResultBox";
-
-import EmptyState from "../components/EmptyState";
 
 import toast from "react-hot-toast";
 
@@ -28,13 +25,8 @@ export default function SplitPDF() {
     setError,
   } = usePDFTool();
 
-  const {
-    result,
-    loading,
-    start,
-    success,
-    reset,
-  } = useResult();
+  const { result, loading, start, success, reset } =
+    useResult();
 
   const handleSplit = async () => {
     if (!pdfFile) {
@@ -68,10 +60,7 @@ export default function SplitPDF() {
   };
 
   return (
-    <ToolLayout
-      title="PDF 分割"
-      description="選擇頁面後輸出新的 PDF"
-    >
+    <ToolLayout>
       {/* LEFT */}
       <div
         style={{
@@ -89,8 +78,6 @@ export default function SplitPDF() {
             toast.success("上傳成功！");
           }}
         />
-
-        
       </div>
 
       {/* RIGHT */}

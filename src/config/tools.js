@@ -2,9 +2,9 @@ export const tools = [
   {
     category: "編輯",
     items: [
-      { title: "PDF 分割", icon: "✂️", path: "/split-pdf" },
-      { title: "PDF 合併", icon: "🧩", path: "/merge-pdf" },
-      { title: "刪除頁面", icon: "🗑️", path: "/delete-pages-pdf" },
+      { title: "PDF 分割",icon: "✂️",path: "/split-pdf",description: "快速拆分 PDF 頁面" },
+      { title: "PDF 合併",icon: "🧩",path: "/merge-pdf",description: "合併多個 PDF 檔案"},
+      { title: "PDF 轉 PNG",icon: "🖼️",path: "/pdf-to-png",description: "轉換成圖片格式" },
       { title: "頁面排序", icon: "🔀", path: "/reorder-pdf" },
       { title: "PDF 壓縮", icon: "📉", path: "/compress-pdf" },
       { title: "提取頁面", icon: "📄", path: "/extract-pdf" },
