@@ -1,9 +1,0 @@
-/*const handleDrag = (id, x, y) => {
-  setNodes((prev) =>
-    prev.map((n) =>
-      n.id === id
-        ? { ...n, position: { x, y } }
-        : n
-    )
-  );
-};*/

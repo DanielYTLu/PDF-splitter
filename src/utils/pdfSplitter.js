@@ -1,20 +1,38 @@
 import { PDFDocument } from "pdf-lib";
-import { saveAs } from "file-saver";
 
-export async function splitPDF(file, pagesArray) {
-  const bytes = await file.arrayBuffer();
-  const pdf = await PDFDocument.load(bytes);
+export async function splitPDF(
+  file,
+  pagesArray
+) {
 
-  const newPdf = await PDFDocument.create();
+  const bytes =
+    await file.arrayBuffer();
 
-  const copiedPages = await newPdf.copyPages(
-    pdf,
-    pagesArray.map((p) => p - 1)
+  const pdf =
+    await PDFDocument.load(bytes);
+
+  const newPdf =
+    await PDFDocument.create();
+
+  const copiedPages =
+    await newPdf.copyPages(
+      pdf,
+      pagesArray.map(
+        (p) => p - 1
+      )
+    );
+
+  copiedPages.forEach((p) =>
+    newPdf.addPage(p)
   );
 
-  copiedPages.forEach((p) => newPdf.addPage(p));
+  const pdfBytes =
+    await newPdf.save();
 
-  const pdfBytes = await newPdf.save();
-
-  saveAs(new Blob([pdfBytes]), "split.pdf");
+  return new Blob(
+    [pdfBytes],
+    {
+      type: "application/pdf",
+    }
+  );
 }

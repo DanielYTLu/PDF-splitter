@@ -1,6 +1,5 @@
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
-import WorkflowPanel from "./WorkflowPanel";
 
 export default function Layout() {
   return (
@@ -31,11 +30,6 @@ export default function Layout() {
           <main style={styles.page}>
             <Outlet />
           </main>
-
-          {/* ⭐ WORKFLOW PANEL（你缺的就是這個） */}
-          <aside style={styles.workflow}>
-            <WorkflowPanel />
-          </aside>
 
         </div>
 
@@ -102,9 +96,4 @@ const styles = {
     padding: 28,
   },
 
-  workflow: {
-    width: 280,
-    borderLeft: "1px solid #e5e7eb",
-    background: "white",
-  },
-};
+  };
