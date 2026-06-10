@@ -1,206 +1,154 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { tools } from "../config/tools";
+import { sidebarStyles as styles } from "../styles/sidebar";
+import { useUser } from "../context/UserContext";
+import { i18n } from "../i18n";
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [theme, setTheme] = useState("light");
+  const { user } = useUser();
+  const lang = user.language;
+
+  // 🔥 監聽 theme（從 body）
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setTheme(document.body.dataset.theme || "light");
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    setTheme(document.body.dataset.theme || "light");
+
+    return () => observer.disconnect();
+  }, []);
+
+  const isDark = theme === "dark";
 
   return (
-    <>
-      {/* SIDEBAR */}
-      <aside
-        style={{
-          ...styles.sidebar,
-          width: collapsed ? 0 : 270,
-          padding: collapsed ? 0 : "14px 10px",
-          overflow: "hidden",
-        }}
-      >
-        {!collapsed && (
-          <>
-            {/* TOP */}
-            <div style={styles.top}>
-              <div style={styles.logo}>
-                <div style={styles.logoBox} />
-                <div style={styles.logoText}>
-                  PDF Workspace
-                </div>
-              </div>
+    <aside
+      style={{
+        ...styles.sidebar,
+        width: collapsed ? 0 : 270,
+        padding: collapsed ? 0 : "14px 10px",
 
-              <button
-                onClick={() => setCollapsed(true)}
-                style={styles.collapseBtn}
-                title="收合"
+        // theme background
+        background: isDark ? "var(--card)" : "var(--card)",
+      }}
+    >
+      {!collapsed && (
+        <>
+          {/* TOP */}
+          <div style={styles.top}>
+            <div style={styles.logo}>
+              <div style={styles.logoBox} />
+              <div
+                style={{
+                  ...styles.logoText,
+                  color: isDark ? "var(--card)" : "#1e293b",
+                }}
               >
-              <div style={styles.arrowIcon} />
-              </button>
+                PDF Workspace
+              </div>
             </div>
 
-            {/* MENU */}
-            <SidebarItem
-              to="/"
-              label="首頁"
-              icon="🏠"
-            />
+            <button
+              onClick={() => setCollapsed(true)}
+              style={styles.collapseBtn}
+              title="收合"
+            >
+              <div style={styles.arrowIcon} />
+            </button>
+          </div>
 
-            {tools.map((group) => (
-              <div key={group.category}>
-                <div style={styles.sectionTitleSmall}>
-                  {group.category}
-                </div>
+          {/* HOME */}
+          <SidebarItem to="/" label={i18n[lang].home} icon="🏠" isDark={isDark} />
 
-                {group.items.map((tool) => (
-                  <SidebarItem
-                    key={tool.path}
-                    to={tool.path}
-                    label={tool.title}
-                    icon={tool.icon}
-                  />
-                ))}
+          {/* TOOLS */}
+          {tools.map((group) => (
+            <div key={group.category}>
+              <div style={styles.sectionTitleSmall}>
+                {group.category}
               </div>
-            ))}
-          </>
-        )}
-      </aside>
 
-      {/* 🔥 永遠存在的展開按鈕（關鍵修復） */}
+              {group.items.map((item) => (
+                <SidebarItem
+                  key={item.path}
+                  to={item.path}
+                  label={item.title}
+                  icon={item.icon}
+                  isDark={isDark}
+                />
+              ))}
+            </div>
+          ))}
+
+          {/* SYSTEM */}
+          <div style={styles.accountSection}>
+            <SidebarItem to="/my-files" label={i18n[lang].myFiles} icon="📁" isDark={isDark} />
+            <SidebarItem to="/profile" label={i18n[lang].profile} icon="👤" isDark={isDark} />
+            <SidebarItem to="/settings" label={i18n[lang].settings} icon="⚙️" isDark={isDark} />
+          </div>
+        </>
+      )}
+
+      {/* EXPAND BUTTON */}
       {collapsed && (
         <button
           onClick={() => setCollapsed(false)}
           style={styles.expandBtn}
-          title="展開側邊欄"
         >
           ☰
         </button>
       )}
-    </>
+    </aside>
   );
 }
 
 /* ================= ITEM ================= */
 
-function SidebarItem({ to, label, icon }) {
+function SidebarItem({ to, label, icon, isDark }) {
   return (
     <NavLink
       to={to}
       style={({ isActive }) => ({
         ...styles.item,
-        color: isActive ? "#4f46e5" : "#475569",
-        background: isActive
+
+        // 🎯 LIGHT MODE (原本設計)
+        color: isDark
+          ? isActive
+            ? "var(--card)fff"
+            : "rgba(255,255,255,0.75)"
+          : isActive
+          ? "#4f46e5"
+          : "#475569",
+
+        background: isDark
+          ? isActive
+            ? "rgba(255,255,255,0.12)"
+            : "transparent"
+          : isActive
           ? "rgba(79,70,229,0.08)"
           : "transparent",
-        borderLeft: isActive
+
+        borderLeft: isDark
+          ? isActive
+            ? "3px solid var(--card)fff"
+            : "3px solid transparent"
+          : isActive
           ? "3px solid #4f46e5"
           : "3px solid transparent",
       })}
     >
-      <span>{icon}</span>
-      <span>{label}</span>
+      <span style={{ width: 22 }}>
+        {icon}
+      </span>
+
+      {label}
     </NavLink>
   );
 }
-
-/* ================= STYLES ================= */
-
-const styles = {
-  sidebar: {
-    minHeight: "100vh",
-    width: 270,
-    background: "#fff",
-    borderRight: "1px solid rgba(0,0,0,0.06)",
-    display: "flex",
-    flexDirection: "column",
-    transition: "0.25s ease",
-  },
-
-  top: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-
-  logo: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-  },
-
-  logoBox: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    background: "linear-gradient(135deg,#4f46e5,#3b82f6)",
-  },
-
-  logoText: {
-    fontWeight: 800,
-    color: "#1e293b",
-  },
-
-  collapseBtn: {
-  width: 34,
-  height: 34,
-  borderRadius: 10,
-
-  border: "1px solid rgba(0,0,0,0.06)",
-  background: "white",
-
-  cursor: "pointer",
-
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-
-  transition: "0.2s ease",
-
-  color: "#64748b",
-  fontSize: 14,
-},
-
-  expandBtn: {
-    position: "fixed",
-    left: 25,
-    top: 16,
-
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-
-    border: "1px solid rgba(79,70,229,0.2)",
-    background: "#4f46e5",
-    color: "white",
-
-    fontSize: 18,
-    cursor: "pointer",
-
-    boxShadow: "0 10px 25px rgba(79,70,229,0.25)",
-    zIndex: 9999,
-  },
-
-  sectionTitleSmall: {
-    fontSize: 11,
-    color: "#94a3b8",
-    margin: "14px 8px 6px",
-    letterSpacing: "0.1em",
-  },
-
-  item: {
-    display: "flex",
-    gap: 10,
-    padding: "11px 12px",
-    borderRadius: 10,
-    textDecoration: "none",
-    fontSize: 14,
-    fontWeight: 600,
-    alignItems: "center",
-    transition: "0.2s",
-  },
-  arrowIcon: {
-  width: 10,
-  height: 10,
-  borderRight: "2px solid #64748b",
-  borderBottom: "2px solid #64748b",
-  transform: "rotate(135deg)", // ⮜
-},
-};

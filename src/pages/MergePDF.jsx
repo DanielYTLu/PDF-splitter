@@ -14,7 +14,7 @@ import {
 } from "@dnd-kit/sortable";
 
 import { mergePDF } from "../utils/pdfMerger";
-
+import { saveFile } from "../utils/fileHistory";
 
 export default function MergePDF() {
   const [files, setFiles] = useState([]);
@@ -59,42 +59,47 @@ export default function MergePDF() {
   // =========================
   // 📚 Merge PDF
   // =========================
-  const handleMerge = async () => {
-    if (files.length < 2) {
-      toast.error("請至少選擇兩個 PDF");
-      return;
-    }
+const handleMerge = async () => {
+  if (files.length < 2) {
+    toast.error("請至少選擇兩個 PDF");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const mergedBlob =
-        await mergePDF(files);
+    const mergedBlob = await mergePDF(files);
 
-      const url =
-        URL.createObjectURL(mergedBlob);
+    // 🔥 存進 My Files v2
+    await saveFile({
+      name: "merged.pdf",
+      tool: "Merge PDF",
+      size: `${(
+        mergedBlob.size / 1024 / 1024
+      ).toFixed(2)} MB`,
+      blob: mergedBlob, // ⭐ 關鍵：可重下載
+    });
 
-      const a =
-        document.createElement("a");
+    // 下載
+    const url = URL.createObjectURL(mergedBlob);
 
-      a.href = url;
-      a.download = "merged.pdf";
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "merged.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+    URL.revokeObjectURL(url);
 
-      URL.revokeObjectURL(url);
-
-      toast.success("PDF 合併完成！");
-    } catch (err) {
-      console.error(err);
-
-      toast.error("PDF 合併失敗");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("PDF 合併完成！");
+  } catch (err) {
+    console.error(err);
+    toast.error("PDF 合併失敗");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{ padding: 20 }}>
@@ -151,7 +156,7 @@ export default function MergePDF() {
             style={{
               padding: 12,
               background: "#0ea5e9",
-              color: "#fff",
+              color: "var(--card)",
               border: "none",
               borderRadius: 8,
               cursor: "pointer",

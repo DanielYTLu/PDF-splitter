@@ -6,7 +6,7 @@ export default function StatCard({
   return (
     <div
       style={{
-        background: "#fff",
+        background: "var(--card)",
         borderRadius: 18,
         padding: 24,
         border: "1px solid #eef2f7",
@@ -33,7 +33,7 @@ export default function StatCard({
 
       <div
         style={{
-          color: "#64748b",
+          color: "var(--muted)",
           marginTop: 6,
         }}
       >

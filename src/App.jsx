@@ -20,6 +20,9 @@ import PageNumberPDF from "./pages/PageNumberPDF";
 import HeaderFooterPDF from "./pages/HeaderFooterPDF";
 import MetadataPDF from "./pages/MetadataPDF";
 import SmartCleanPDF from "./pages/SmartCleanPDF";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import MyFiles from "./pages/MyFiles";
 
 function App() {
   return (
@@ -43,6 +46,9 @@ function App() {
         <Route path="/header-footer-pdf" element={<HeaderFooterPDF />} />
         <Route path="/metadata-pdf" element={<MetadataPDF />} />
         <Route path="/smart-clean-pdf" element={<SmartCleanPDF />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/my-files" element={<MyFiles />} />
       </Route>
     </Routes>
   );

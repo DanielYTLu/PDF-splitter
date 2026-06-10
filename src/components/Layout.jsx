@@ -1,11 +1,12 @@
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Layout() {
   const [openMenu, setOpenMenu] = useState(false);
   const [openNotify, setOpenNotify] = useState(false);
-
+  const navigate = useNavigate();
   const menuRef = useRef();
   const notifyRef = useRef();
 
@@ -29,10 +30,8 @@ export default function Layout() {
       <Sidebar />
 
       <div style={styles.main}>
-
         {/* TOP BAR */}
         <header style={styles.header}>
-
           {/* LEFT */}
           <div style={styles.left}>
             <div style={styles.logo} />
@@ -43,15 +42,9 @@ export default function Layout() {
           <div style={styles.actions}>
             <input
               placeholder="Search tools..."
-              style={{
-                width: 240,
-                height: 40,
-                borderRadius: 12,
-                border: "1px solid #e5e7eb",
-                padding: "0 14px",
-                background: "white",
-              }}
+              style={styles.search}
             />
+
             {/* 🔔 Notification */}
             <div ref={notifyRef} style={{ position: "relative" }}>
               <button
@@ -91,17 +84,16 @@ export default function Layout() {
 
               {openMenu && (
                 <div style={styles.dropdown}>
-                  <div style={styles.menuItem}>👤 Profile</div>
-                  <div style={styles.menuItem}>⚙️ Settings</div>
-                  <div style={styles.menuItem}>📄 My Files</div>
+                  <div style={styles.menuItem}onClick={() => navigate("/profile")}>👤 Profile</div>
 
-                  <div style={styles.divider}></div>
+                  <div style={styles.menuItem}onClick={() => navigate("/settings")}>⚙️ Settings</div>
 
-                  <div style={styles.menuItemDanger}>🚪 Logout</div>
+                  <div style={styles.menuItem}onClick={() => navigate("/my-files")}>📄 My Files</div>
+
+                  <div style={styles.menuItemDanger}onClick={() => {localStorage.clear();navigate("/");}}>🚪 Logout</div>
                 </div>
               )}
             </div>
-
           </div>
         </header>
 
@@ -111,7 +103,6 @@ export default function Layout() {
             <Outlet />
           </main>
         </div>
-
       </div>
     </div>
   );
@@ -123,7 +114,8 @@ const styles = {
   container: {
     display: "flex",
     minHeight: "100vh",
-    background: "linear-gradient(to bottom, #f8fafc, #eef2ff)",
+    background: "var(--bg)",
+    color: "var(--text)",
   },
 
   main: {
@@ -138,9 +130,11 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "0 28px",
-    background: "rgba(255,255,255,0.7)",
-    backdropFilter: "blur(14px)",
-    borderBottom: "1px solid rgba(0,0,0,0.06)",
+
+    background: "var(--surface)",
+    backdropFilter: "blur(16px)",
+
+    borderBottom: "1px solid var(--border)",
     position: "sticky",
     top: 0,
     zIndex: 50,
@@ -156,19 +150,30 @@ const styles = {
     width: 34,
     height: 34,
     borderRadius: 10,
-    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+    background: "linear-gradient(135deg, #4f46e5, #06b6d4)",
   },
 
   title: {
     fontSize: 16,
     fontWeight: 700,
-    color: "#1e3a8a",
+    color: "var(--text)",
   },
 
   actions: {
     display: "flex",
     gap: 10,
     alignItems: "center",
+  },
+
+  search: {
+    width: 240,
+    height: 40,
+    borderRadius: 12,
+    border: "1px solid var(--border)",
+    padding: "0 14px",
+    background: "var(--surface)",
+    color: "var(--text)",
+    outline: "none",
   },
 
   content: {
@@ -179,6 +184,7 @@ const styles = {
   page: {
     flex: 1,
     padding: 28,
+    background: "var(--bg)",
   },
 
   /* dropdown */
@@ -187,11 +193,13 @@ const styles = {
     top: 50,
     right: 0,
     width: 200,
-    background: "rgba(255,255,255,0.92)",
+
+    background: "var(--surface)",
     backdropFilter: "blur(16px)",
-    border: "1px solid rgba(0,0,0,0.06)",
+    border: "1px solid var(--border)",
     borderRadius: 14,
-    boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
+
+    boxShadow: "var(--shadow)",
     padding: 8,
     zIndex: 100,
   },
@@ -213,7 +221,7 @@ const styles = {
 
   divider: {
     height: 1,
-    background: "rgba(0,0,0,0.06)",
+    background: "var(--border)",
     margin: "6px 0",
   },
 };

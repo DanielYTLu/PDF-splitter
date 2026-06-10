@@ -1,0 +1,21 @@
+:root {
+  --bg: #f8fafc;
+  --card: var(--card)fff;
+  --text: #0f172a;
+  --muted: var(--muted);
+  --border: var(--border);
+
+  --primary: #4f46e5;
+  --card-shadow: 0 10px 30px rgba(0,0,0,0.04);
+}
+
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --card: #111827;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --border: #1f2937;
+
+  --primary: #6366f1;
+  --card-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}

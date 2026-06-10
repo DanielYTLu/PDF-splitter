@@ -17,7 +17,7 @@ export default function ToolCard({
           background: "white",
           borderRadius: 20,
           padding: 20,
-          border: "1px solid #e2e8f0",
+          border: "1px solid var(--border)",
 
           minHeight: 190,
 
@@ -93,7 +93,7 @@ export default function ToolCard({
 
         <p
           style={{
-            color: "#64748b",
+            color: "var(--muted)",
             fontSize: 14,
             marginTop: 10,
             lineHeight: 1.5,

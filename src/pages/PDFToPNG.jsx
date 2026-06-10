@@ -84,7 +84,7 @@ export default function PDFToPNG() {
               fontWeight: 600,
               fontSize: 14,
               cursor: loading || !file ? "not-allowed" : "pointer",
-              background: loading || !file ? "#a5b4fc" : "#4f46e5",
+              background: loading || !file ? "#a5b4fc" : "var(--primary)",
               color: "white",
               boxShadow: "0 6px 16px rgba(79,70,229,0.25)",
               transition: "all 0.2s ease",

@@ -47,7 +47,7 @@ export default function Dropzone({
         cursor: "pointer",
         background: isDragging
           ? "#eff6ff"
-          : "#ffffff",
+          : "var(--card)fff",
         transition: "0.2s",
         boxShadow: isDragging
           ? "0 8px 25px rgba(37,99,235,0.15)"

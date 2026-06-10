@@ -4,11 +4,9 @@
 
   border-radius: 12px;
 
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--border);
 
-  /* ⭐ 重點：提高 contrast */
-  background: rgba(255, 255, 255, 0.85);
-
+  background: var(--surface);
   backdrop-filter: blur(16px);
 
   display: flex;
@@ -16,38 +14,29 @@
   justify-content: center;
 
   font-size: 16px;
-
   cursor: pointer;
 
   position: relative;
 
   transition: all 0.2s ease;
 
-  /* ⭐ 更明顯 layer shadow */
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 6px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow);
 }
 
 /* ✨ hover：明確浮起 + 色彩層 */
 .top-btn:hover {
   transform: translateY(-2px) scale(1.03);
 
-  background: rgba(255, 255, 255, 1);
-
-  border-color: rgba(79, 70, 229, 0.25);
+  border-color: var(--primary);
 
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.10),
-    0 10px 20px rgba(79, 70, 229, 0.12);
+    0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
 /* 🔥 active：壓縮感 */
 .top-btn:active {
   transform: translateY(0px) scale(0.96);
-
-  box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
 }
 
 /* 💎 focus：SaaS ring */
@@ -56,5 +45,5 @@
 
   box-shadow:
     0 0 0 3px rgba(79, 70, 229, 0.25),
-    0 8px 18px rgba(0, 0, 0, 0.08);
+    var(--shadow);
 }

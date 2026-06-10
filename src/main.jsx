@@ -4,16 +4,24 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 
-import "./index.css";
-import "./styles/layout.css";   // ⭐⭐⭐ 加這行（關鍵修復）
-
 import { Toaster } from "react-hot-toast";
+import { UserProvider } from "./context/UserContext";
+
+/* =====================
+   CSS ORDER（正確順序）
+===================== */
+import "./styles/variables.css";
+import "./index.css";
+import "./styles/layout.css";
+import "./styles/components.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <Toaster position="top-right" reverseOrder={false} />
-      <App />
+      <UserProvider>
+        <Toaster position="top-right" reverseOrder={false} />
+        <App />
+      </UserProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
