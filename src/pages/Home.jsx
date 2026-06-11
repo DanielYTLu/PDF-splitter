@@ -1,17 +1,48 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ToolCard from "../components/ToolCard";
 import StatCard from "../components/ui/StatCard";
 import { tools } from "../config/tools";
+import { useUser } from "../context/UserContext";
+import { t } from "../i18n";
 
 export default function Home() {
   const [query, setQuery] = useState("");
+  const { user } = useUser();
+  const lang = user.language;
 
-  const allTools = tools.flatMap((group) =>
-    group.items.map((item) => ({
-      ...item,
-      category: group.category,
-    }))
+  const isSearching = query.trim().length > 0;
+
+  const allTools = useMemo(
+    () =>
+      tools.flatMap((group) =>
+        group.items.map((item) => ({
+          ...item,
+          category: group.category,
+        }))
+      ),
+    []
   );
+
+  const filteredTools = useMemo(() => {
+    const keyword = query.toLowerCase();
+
+    return allTools.filter((tool) => {
+      const title = t(lang, tool.title).toLowerCase();
+
+      const description = tool.description
+        ? t(lang, tool.description).toLowerCase()
+        : "";
+
+      const category = t(lang, tool.category).toLowerCase();
+
+      return (
+        title.includes(keyword) ||
+        description.includes(keyword) ||
+        category.includes(keyword) ||
+        tool.title.toLowerCase().includes(keyword)
+      );
+    });
+  }, [query, allTools, lang]);
 
   return (
     <div
@@ -25,8 +56,7 @@ export default function Home() {
       {/* HERO */}
       <div
         style={{
-          background:
-            "linear-gradient(135deg,#2563eb,#7c3aed)",
+          background: "linear-gradient(135deg,#2563eb,#7c3aed)",
           borderRadius: 28,
           padding: "48px 32px",
           textAlign: "center",
@@ -39,13 +69,13 @@ export default function Home() {
         </h1>
 
         <p style={{ opacity: 0.9 }}>
-          Professional PDF Toolkit
+          {t(lang, "professionalToolkit")}
         </p>
 
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="搜尋 PDF 工具..."
+          placeholder={t(lang, "searchTools")}
           style={{
             width: "100%",
             maxWidth: 650,
@@ -86,16 +116,47 @@ export default function Home() {
         />
       </div>
 
-      {/* SECTION TITLE FIX */}
-      <h2 style={{ color: "var(--text)" }}>
-        ⚡ Quick Actions
-      </h2>
+      {/* ========================= */}
+      {/* NORMAL MODE (分類模式) */}
+      {/* ========================= */}
+      {!isSearching && (
+        <>
+          {tools.map((group) => (
+            <div key={group.category} style={{ marginBottom: 40 }}>
+              <h2 style={{ color: "var(--text)" }}>
+                {t(lang, group.category)}
+              </h2>
 
-      {/* TOOLS */}
-      {tools.map((group) => (
-        <div key={group.category} style={{ marginBottom: 40 }}>
-          <h2 style={{ color: "var(--text)" }}>
-            {group.category}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "repeat(auto-fill,minmax(220px,1fr))",
+                  gap: 16,
+                }}
+              >
+                {group.items.map((tool) => (
+                  <ToolCard
+                    key={tool.path}
+                    tool={{
+                      ...tool,
+                      category: group.category,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* ========================= */}
+      {/* SEARCH MODE */}
+      {/* ========================= */}
+      {isSearching && (
+        <>
+          <h2 style={{ color: "var(--text)", marginBottom: 16 }}>
+            🔍 {t(lang, "searchResults")}
           </h2>
 
           <div
@@ -106,12 +167,27 @@ export default function Home() {
               gap: 16,
             }}
           >
-            {group.items.map((tool) => (
-              <ToolCard key={tool.path} tool={tool} />
-            ))}
+            {filteredTools.length === 0 ? (
+              <div
+                style={{
+                  padding: 60,
+                  textAlign: "center",
+                  color: "var(--muted)",
+                  gridColumn: "1 / -1",
+                }}
+              >
+                <div style={{ fontSize: 48 }}>🔍</div>
+                <h3>{t(lang, "noResults")}</h3>
+                <p>{t(lang, "tryAnotherKeyword")}</p>
+              </div>
+            ) : (
+              filteredTools.map((tool) => (
+                <ToolCard key={tool.path} tool={tool} />
+              ))
+            )}
           </div>
-        </div>
-      ))}
+        </>
+      )}
     </div>
   );
 }

@@ -1,139 +1,136 @@
-import { useState } from "react";
-import usePDFTool from "../hooks/usePDFTool";
+import { useState, useEffect } from "react";
+
 import FileUploader from "../components/FileUploader";
-import PDFViewer from "../components/PDFViewer";
-import { reorderPages } from "../utils/reorderPages";
-import toast from "react-hot-toast";
+import PageSelector from "../components/PageSelector";
 import Loading from "../components/Loading";
 
+import toast from "react-hot-toast";
+
+import { buildReorderedPDF } from "../utils/reorderPages";
+import { downloadFile } from "../utils/downloadFile";
+import { getPDFPageCount } from "../utils/getPDFPageCount";
+import { renderPage } from "../utils/renderPDFPage";
+
 export default function ReorderPDF() {
-  const [selectedPages, setSelectedPages] = useState([]);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [orderedPages, setOrderedPages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const {
-    file: pdfFile,
-    setFile: setPdfFile,
-    loading,
-    setLoading,
-    error,
-    setError,
-    handleSuccess,
-    handleError,
-  } = usePDFTool();
+  useEffect(() => {
+    if (!pdfFile) return;
 
-  const handleReorder = async () => {
-    if (!pdfFile) {
-      toast.error("請先上傳 PDF");
-      return;
-    }
+    const loadPages = async () => {
+      try {
+        setLoading(true);
 
-    if (!selectedPages.length) {
-      toast.error("請至少選擇頁面");
-      return;
-    }
+        const count = await getPDFPageCount(pdfFile);
 
+        const pages = await Promise.all(
+          Array.from({ length: count }, async (_, i) => {
+            const page = await renderPage(pdfFile, i + 1, 0.5);
+
+            return {
+              id: i + 1,
+              thumbnail: page.src,
+              width: page.width,
+              height: page.height,
+              selected: false,
+            };
+          })
+        );
+
+        setOrderedPages(pages);
+      } catch (err) {
+        console.error(err);
+        setError("PDF 載入失敗");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPages();
+  }, [pdfFile]);
+
+  const handleExport = async () => {
     try {
       setLoading(true);
 
-      await reorderPages(pdfFile, selectedPages);
+      const blob = await buildReorderedPDF(
+        pdfFile,
+        orderedPages
+      );
 
-      handleSuccess("重新排序完成！");
+      downloadFile(blob, "reordered.pdf");
+
+      toast.success("輸出成功");
     } catch (err) {
       console.error(err);
-      handleError(err, "處理失敗");
+      toast.error("輸出失敗");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      {/* Title */}
-      <h1>
-        🔀 PDF 頁面重新排序
-      </h1>
+    <div style={{ padding: 20 }}>
+      <h2>🔀 PDF 頁面重新排序</h2>
 
-      {loading && <Loading text="正在重新排序 PDF..." />}
-
-      {error && (
-        <div style={{ color: "red", marginBottom: 10 }}>
-          {error}
-        </div>
-      )}
+      {loading && <Loading text="處理中..." />}
 
       {!pdfFile && (
-        <div
-          style={{
-            background: "white",
-            padding: 20,
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-            marginBottom: 20,
-          }}
-        >
-          <FileUploader
-            onFile={(file) => {
-              setPdfFile(file);
-              toast.success("上傳成功！");
-            }}
-          />
-        </div>
+        <FileUploader onFile={setPdfFile} />
       )}
 
       {pdfFile && (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "3fr 1fr",
+            gridTemplateColumns: "3fr 300px",
             gap: 20,
           }}
         >
-          {/* LEFT */}
+          <PageSelector
+            orderedPages={orderedPages}
+            setOrderedPages={setOrderedPages}
+          />
+
           <div
             style={{
-              background: "white",
               padding: 16,
+              border: "1px solid #e2e8f0",
               borderRadius: 12,
-              border: "1px solid #e5e7eb",
             }}
           >
-            <PDFViewer
-              file={pdfFile}
-              selectedPages={selectedPages}
-              setSelectedPages={setSelectedPages}
-              setError={setError}
-            />
-          </div>
+            <h3>控制面板</h3>
 
-          {/* RIGHT */}
-          <div
-            style={{
-              background: "white",
-              padding: 16,
-              borderRadius: 12,
-              border: "1px solid #e5e7eb",
-            }}
-          >
-            <h3 style={{ marginTop: 0 }}>排序控制</h3>
-
-            <p>
-              已選順序：{selectedPages.join(" → ")}
-            </p>
+            <p>共 {orderedPages.length} 頁</p>
 
             <button
-              onClick={handleReorder}
-              disabled={loading}
+              onClick={() =>
+                setOrderedPages([...orderedPages].reverse())
+              }
+              style={{
+                width: "100%",
+                marginBottom: 10,
+                padding: 10,
+              }}
+            >
+              🔄 反轉順序
+            </button>
+
+            <button
+              onClick={handleExport}
               style={{
                 width: "100%",
                 padding: 12,
-                background: loading ? "#a78bfa" : "#7c3aed",
-                color: "white",
+                background: "#7c3aed",
+                color: "#fff",
                 border: "none",
                 borderRadius: 8,
-                cursor: loading ? "not-allowed" : "pointer",
-                fontWeight: 600,
               }}
             >
-              {loading ? "處理中..." : "🔀 重新輸出 PDF"}
+              🔀 匯出 PDF
             </button>
           </div>
         </div>

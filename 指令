@@ -2,3 +2,9 @@ git status
 git add .
 git commit -m "這次修改的內容"
 git push
+
+PDF合併 完成
+PDF 分割 有問題
+PDF 壓縮 完成
+PDF 頁面排序 有問題
+

@@ -1,9 +1,8 @@
 import { PDFDocument } from "pdf-lib";
 import { saveAs } from "file-saver";
 
-export async function compressPDF(file) {
+export async function compressPDF(file, settings = {}) {
   const bytes = await file.arrayBuffer();
-
   const pdf = await PDFDocument.load(bytes);
 
   const newPdf = await PDFDocument.create();
@@ -13,17 +12,33 @@ export async function compressPDF(file) {
     pdf.getPageIndices()
   );
 
-  pages.forEach((page) => {
-    newPdf.addPage(page);
-  });
+  pages.forEach((page) => newPdf.addPage(page));
 
-  // ⚠️ 關鍵：降低解析度（間接壓縮）
-  const pdfBytes = await newPdf.save({
-    useObjectStreams: false,
+  const level = settings.level || "medium";
+
+  // 🧠 模擬壓縮策略（SaaS級關鍵）
+  let options = {
+    useObjectStreams: true,
+  };
+
+  if (level === "low") {
+    options.useObjectStreams = false;
+  }
+
+  if (level === "high") {
+    options.useObjectStreams = true;
+  }
+
+  const pdfBytes = await newPdf.save(options);
+
+  const blob = new Blob([pdfBytes], {
+    type: "application/pdf",
   });
 
   saveAs(
-    new Blob([pdfBytes]),
-    "compressed.pdf"
+    blob,
+    `compressed_${level}.pdf`
   );
+
+  return blob;
 }

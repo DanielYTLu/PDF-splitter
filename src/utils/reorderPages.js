@@ -1,26 +1,18 @@
 import { PDFDocument } from "pdf-lib";
-import { saveAs } from "file-saver";
 
-export async function reorderPages(file, pageOrder) {
+export async function buildReorderedPDF(file, orderedPages) {
   const bytes = await file.arrayBuffer();
-
   const pdf = await PDFDocument.load(bytes);
 
   const newPdf = await PDFDocument.create();
 
-  const copiedPages = await newPdf.copyPages(
-    pdf,
-    pageOrder.map((p) => p - 1)
-  );
+  const indexes = orderedPages.map(p => p.id - 1);
 
-  copiedPages.forEach(page => {
-    newPdf.addPage(page);
-  });
+  const copiedPages = await newPdf.copyPages(pdf, indexes);
+
+  copiedPages.forEach(p => newPdf.addPage(p));
 
   const pdfBytes = await newPdf.save();
 
-  saveAs(
-    new Blob([pdfBytes]),
-    "reordered.pdf"
-  );
+  return new Blob([pdfBytes], { type: "application/pdf" });
 }

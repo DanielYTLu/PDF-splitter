@@ -1,5 +1,4 @@
 import Dropzone from "./Dropzone";
-import toast from "react-hot-toast";
 
 export default function FileUploader({
   onFile,
@@ -11,18 +10,9 @@ export default function FileUploader({
       multiple={multiple}
       accept={accept}
       onFile={(file) => {
-        if (!file) {
-          toast.error("請選擇檔案");
-          return;
-        }
+        if (!file) return;
 
         onFile(file);
-
-        toast.success(
-          multiple
-            ? "檔案已加入！"
-            : "上傳成功！"
-        );
       }}
     />
   );

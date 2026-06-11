@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import FileCard from "../components/FileCard";
 import FileUploader from "../components/FileUploader";
 import Loading from "../components/Loading";
+import MergePDFSettings from "../components/MergePDFSettings";
 
 import toast from "react-hot-toast";
 
@@ -20,17 +21,29 @@ export default function MergePDF() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [settings, setSettings] = useState({
+    mode: "order",
+  });
+
+  // =========================
+  // 🧠 UI ORDER LAYER（核心升級）
+  // =========================
+  const orderedFiles = useMemo(() => {
+    if (settings.mode === "reverse") {
+      return [...files].slice().reverse();
+    }
+    return files;
+  }, [files, settings.mode]);
+
   // =========================
   // 🗑 Delete
   // =========================
   const handleDelete = (name) => {
-    setFiles((prev) =>
-      prev.filter((f) => f.name !== name)
-    );
+    setFiles((prev) => prev.filter((f) => f.name !== name));
   };
 
   // =========================
-  // 🔀 Drag reorder
+  // 🔀 Drag reorder（修正版：永遠操作 source）
   // =========================
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -38,134 +51,214 @@ export default function MergePDF() {
     if (!over) return;
 
     if (active.id !== over.id) {
-      const oldIndex = files.findIndex(
-        (f) => f.name === active.id
-      );
+      const oldIndex = files.findIndex((f) => f.name === active.id);
+      const newIndex = files.findIndex((f) => f.name === over.id);
 
-      const newIndex = files.findIndex(
-        (f) => f.name === over.id
-      );
-
-      setFiles(
-        arrayMove(
-          files,
-          oldIndex,
-          newIndex
-        )
-      );
+      setFiles(arrayMove(files, oldIndex, newIndex));
     }
   };
 
   // =========================
   // 📚 Merge PDF
   // =========================
-const handleMerge = async () => {
-  if (files.length < 2) {
-    toast.error("請至少選擇兩個 PDF");
-    return;
-  }
+  const handleMerge = async () => {
+    if (files.length < 2) {
+      toast.error("請至少選擇兩個 PDF");
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const mergedBlob = await mergePDF(files);
+      const mergedBlob = await mergePDF(files, settings);
 
-    // 🔥 存進 My Files v2
-    await saveFile({
-      name: "merged.pdf",
-      tool: "Merge PDF",
-      size: `${(
-        mergedBlob.size / 1024 / 1024
-      ).toFixed(2)} MB`,
-      blob: mergedBlob, // ⭐ 關鍵：可重下載
-    });
+      await saveFile({
+        name: "merged.pdf",
+        tool: "Merge PDF",
+        size: `${(mergedBlob.size / 1024 / 1024).toFixed(2)} MB`,
+        blob: mergedBlob,
+      });
 
-    // 下載
-    const url = URL.createObjectURL(mergedBlob);
+      const url = URL.createObjectURL(mergedBlob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "merged.pdf";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "merged.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
 
-    URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
 
-    toast.success("PDF 合併完成！");
-  } catch (err) {
-    console.error(err);
-    toast.error("PDF 合併失敗");
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.success("PDF 合併完成！");
+    } catch (err) {
+      console.error(err);
+      toast.error("PDF 合併失敗");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>📚 PDF 合併
-      </h1>
+    <div style={styles.page}>
+      {/* HEADER */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>📚 Merge PDF</h1>
+        <p style={styles.subtitle}>
+          上傳 → 排序 → 設定 → 合併輸出
+        </p>
+      </div>
 
-      <FileUploader
-        multiple
-        onFile={(newFiles) => {
-          setFiles((prev) => [
-            ...prev,
-            ...(Array.isArray(newFiles)
-              ? newFiles
-              : [newFiles]),
-          ]);
-        }}
-      />
-
-      {loading && <Loading />}
-
-      <br />
-
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={files.map(
-            (f) => f.name
-          )}
-          strategy={
-            verticalListSortingStrategy
-          }
-        >
-          {files.map((file) => (
-            <FileCard
-              key={file.name}
-              file={file}
-              onDelete={handleDelete}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
-
-      {files.length > 0 && (
-        <div
-          style={{
-            marginTop: 20,
+      {/* STEP 1 UPLOAD */}
+      <div style={styles.card}>
+        <div style={styles.stepTitle}>1️⃣ 上傳檔案</div>
+        <FileUploader
+          multiple
+          onFile={(newFiles) => {
+            setFiles((prev) => [
+              ...prev,
+              ...(Array.isArray(newFiles) ? newFiles : [newFiles]),
+            ]);
           }}
-        >
+        />
+      </div>
+
+      {/* STEP 2 SETTINGS */}
+      <div style={styles.card}>
+        <div style={styles.stepTitle}>2️⃣ 合併模式</div>
+        <MergePDFSettings
+          settings={settings}
+          setSettings={setSettings}
+        />
+      </div>
+
+      {/* STEP 3 ORDER */}
+      <div style={styles.card}>
+        <div style={styles.stepTitle}>3️⃣ 排序檔案</div>
+
+        {files.length === 0 ? (
+          <div style={styles.empty}>
+            尚未上傳 PDF，請先加入檔案
+          </div>
+        ) : (
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={orderedFiles.map((f) => f.name)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div style={styles.list}>
+                {orderedFiles.map((file) => (
+                  <div
+                    key={file.name}
+                    style={styles.item}
+                  >
+                    <FileCard
+                      file={file}
+                      onDelete={handleDelete}
+                    />
+                  </div>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
+      </div>
+
+      {/* STEP 4 ACTION */}
+      {files.length > 0 && (
+        <div style={styles.actionBar}>
           <button
             onClick={handleMerge}
             disabled={loading}
-            style={{
-              padding: 12,
-              background: "#0ea5e9",
-              color: "var(--card)",
-              border: "none",
-              borderRadius: 8,
-              cursor: "pointer",
-            }}
+            style={styles.button}
           >
-            📚 開始合併
+            🚀 合併 PDF
           </button>
         </div>
       )}
+
+      {loading && <Loading />}
     </div>
   );
 }
+
+/* =========================
+🎨 PRODUCT LEVEL UI
+========================= */
+const styles = {
+  page: {
+    padding: 24,
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+
+  header: {
+    marginBottom: 24,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: 700,
+  },
+
+  subtitle: {
+    color: "#64748b",
+    fontSize: 13,
+    marginTop: 6,
+  },
+
+  card: {
+    background: "#fff",
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+    border: "1px solid #eef2f7",
+  },
+
+  stepTitle: {
+    fontSize: 13,
+    fontWeight: 600,
+    marginBottom: 10,
+    color: "#0f172a",
+  },
+
+  list: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+
+  item: {
+    transition: "transform 0.18s ease, box-shadow 0.18s ease",
+  },
+
+  empty: {
+    padding: 20,
+    textAlign: "center",
+    color: "#94a3b8",
+    background: "#f8fafc",
+    borderRadius: 10,
+  },
+
+  actionBar: {
+    position: "sticky",
+    bottom: 20,
+    display: "flex",
+    justifyContent: "center",
+  },
+
+  button: {
+    padding: "12px 22px",
+    background: "linear-gradient(135deg,#0ea5e9,#2563eb)",
+    color: "white",
+    border: "none",
+    borderRadius: 12,
+    cursor: "pointer",
+    fontWeight: 600,
+    boxShadow: "0 10px 25px rgba(14,165,233,0.3)",
+  },
+};

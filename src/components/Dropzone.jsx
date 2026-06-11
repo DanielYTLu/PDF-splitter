@@ -7,6 +7,7 @@ export default function Dropzone({
 }) {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isHover, setIsHover] = useState(false);
 
   const handleFile = (file) => {
     if (!file) return;
@@ -20,41 +21,23 @@ export default function Dropzone({
         e.preventDefault();
         setIsDragging(true);
       }}
-      onDragLeave={() => {
-        setIsDragging(false);
-      }}
+      onDragLeave={() => setIsDragging(false)}
       onDrop={(e) => {
         e.preventDefault();
         setIsDragging(false);
 
         if (multiple) {
-          handleFile(
-            Array.from(e.dataTransfer.files)
-          );
+          handleFile(Array.from(e.dataTransfer.files));
         } else {
-          handleFile(
-            e.dataTransfer.files[0]
-          );
+          handleFile(e.dataTransfer.files[0]);
         }
       }}
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
       style={{
-        border: isDragging
-          ? "2px solid #2563eb"
-          : "2px dashed #cbd5e1",
-        padding: 40,
-        borderRadius: 14,
-        textAlign: "center",
-        cursor: "pointer",
-        background: isDragging
-          ? "#eff6ff"
-          : "var(--card)fff",
-        transition: "0.2s",
-        boxShadow: isDragging
-          ? "0 8px 25px rgba(37,99,235,0.15)"
-          : "none",
-        transform: isDragging
-          ? "scale(1.01)"
-          : "scale(1)",
+        ...styles.box,
+        ...(isDragging ? styles.dragging : {}),
+        ...(isHover && !isDragging ? styles.hover : {}),
       }}
     >
       <input
@@ -65,47 +48,71 @@ export default function Dropzone({
         hidden
         onChange={(e) => {
           if (multiple) {
-            handleFile(
-              Array.from(
-                e.target.files || []
-              )
-            );
+            handleFile(Array.from(e.target.files || []));
           } else {
-            handleFile(
-              e.target.files?.[0]
-            );
+            handleFile(e.target.files?.[0]);
           }
         }}
       />
 
-      <div
-        style={{
-          fontSize: 28,
-          marginBottom: 8,
-        }}
-      >
-        📂
+      <div style={styles.icon}>📄</div>
+
+      <div style={styles.title}>
+        {isDragging ? "放開以上傳檔案" : "拖曳檔案到此處"}
       </div>
 
-      <div
-        style={{
-          fontSize: 16,
-          fontWeight: 600,
-          color: "#111827",
-        }}
-      >
-        拖曳檔案到這裡
-      </div>
-
-      <div
-        style={{
-          fontSize: 12,
-          color: "#6b7280",
-          marginTop: 6,
-        }}
-      >
-        或點擊選擇檔案
+      <div style={styles.subtitle}>
+        或點擊選擇檔案（支援 PDF 上傳）
       </div>
     </div>
   );
 }
+
+/* =========================
+🎨 Stripe / SaaS STYLE
+========================= */
+const styles = {
+  box: {
+    padding: 44,
+    borderRadius: 16,
+    textAlign: "center",
+    cursor: "pointer",
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
+    position: "relative",
+  },
+
+  hover: {
+    transform: "translateY(-2px)",
+    borderColor: "#93c5fd",
+    boxShadow: "0 10px 30px rgba(59,130,246,0.12)",
+  },
+
+  dragging: {
+    border: "1px solid #2563eb",
+    background: "linear-gradient(135deg, #eff6ff, #ffffff)",
+    boxShadow: "0 15px 40px rgba(37,99,235,0.18)",
+    transform: "scale(1.02)",
+  },
+
+  icon: {
+    fontSize: 34,
+    marginBottom: 10,
+    filter: "grayscale(0.2)",
+  },
+
+  title: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: "#0f172a",
+    marginBottom: 6,
+    letterSpacing: "-0.01em",
+  },
+
+  subtitle: {
+    fontSize: 12,
+    color: "#64748b",
+  },
+};

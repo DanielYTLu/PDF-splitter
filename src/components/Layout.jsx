@@ -2,6 +2,8 @@ import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import { t } from "../i18n";
 
 export default function Layout() {
   const [openMenu, setOpenMenu] = useState(false);
@@ -9,6 +11,8 @@ export default function Layout() {
   const navigate = useNavigate();
   const menuRef = useRef();
   const notifyRef = useRef();
+  const { user } = useUser();
+  const lang = user.language;
 
   // click outside close
   useEffect(() => {
@@ -41,7 +45,7 @@ export default function Layout() {
           {/* ACTIONS */}
           <div style={styles.actions}>
             <input
-              placeholder="Search tools..."
+              placeholder={t(lang, "search")}
               style={styles.search}
             />
 
@@ -56,9 +60,9 @@ export default function Layout() {
 
               {openNotify && (
                 <div style={styles.dropdown}>
-                  <div style={styles.menuItem}>📄 PDF 處理完成</div>
-                  <div style={styles.menuItem}>🔒 檔案已加密</div>
-                  <div style={styles.menuItem}>📥 新版本更新</div>
+                  <div style={styles.menuItem}>📄 {t(lang, "pdfDone")}</div>
+                  <div style={styles.menuItem}>🔒 {t(lang, "encrypted")}</div>
+                  <div style={styles.menuItem}>📥 {t(lang, "update")}</div>
                 </div>
               )}
             </div>
@@ -84,13 +88,13 @@ export default function Layout() {
 
               {openMenu && (
                 <div style={styles.dropdown}>
-                  <div style={styles.menuItem}onClick={() => navigate("/profile")}>👤 Profile</div>
+                  <div style={styles.menuItem}onClick={() => navigate("/profile")}>👤 {t(lang, "profile")}</div>
 
-                  <div style={styles.menuItem}onClick={() => navigate("/settings")}>⚙️ Settings</div>
+                  <div style={styles.menuItem}onClick={() => navigate("/settings")}>⚙️ {t(lang, "settings")}</div>
 
-                  <div style={styles.menuItem}onClick={() => navigate("/my-files")}>📄 My Files</div>
+                  <div style={styles.menuItem}onClick={() => navigate("/my-files")}>📄 {t(lang, "myFiles")}</div>
 
-                  <div style={styles.menuItemDanger}onClick={() => {localStorage.clear();navigate("/");}}>🚪 Logout</div>
+                  <div style={styles.menuItemDanger}onClick={() => {localStorage.clear();navigate("/");}}>🚪 {t(lang, "logout")}</div>
                 </div>
               )}
             </div>

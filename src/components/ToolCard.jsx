@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import { t } from "../i18n";
 
 export default function ToolCard({
   tool,
   onClick,
 }) {
+  const { user } = useUser();
+  const lang = user.language;
+
   return (
     <Link
       to={tool.path}
@@ -88,7 +93,7 @@ export default function ToolCard({
             color: "#0f172a",
           }}
         >
-          {tool.title}
+          {t(lang, tool.title)}
         </h3>
 
         <p
@@ -100,8 +105,9 @@ export default function ToolCard({
             flex: 1,
           }}
         >
-          {tool.description ||
-            "Professional PDF Tool"}
+          {tool.description
+            ? t(lang, tool.description)
+            : t(lang, "professionalPdfTool")}
         </p>
 
         <div
@@ -124,7 +130,7 @@ export default function ToolCard({
             marginBottom: 16,
           }}
         >
-          {tool.category}
+          {t(lang, tool.category)}
         </div>
 
         <div
@@ -134,7 +140,7 @@ export default function ToolCard({
             fontWeight: 700,
           }}
         >
-          Open Tool →
+          {t(lang, "openTool")} →
         </div>
       </div>
     </Link>

@@ -7,7 +7,7 @@ import ResultBox from "../components/ui/ResultBox";
 import LoadingOverlay from "../components/LoadingOverlay";
 
 import { smartCleanPDF } from "../utils/smartCleanPDF";
-import { downloadBlob } from "../utils/downloadFile";
+import { downloadFile } from "../utils/downloadFile";
 
 import toast from "react-hot-toast";
 

@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { tools } from "../config/tools";
 import { sidebarStyles as styles } from "../styles/sidebar";
 import { useUser } from "../context/UserContext";
-import { i18n } from "../i18n";
+import { t } from "../i18n";
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -11,7 +11,6 @@ export default function Sidebar() {
   const { user } = useUser();
   const lang = user.language;
 
-  // 🔥 監聽 theme（從 body）
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setTheme(document.body.dataset.theme || "light");
@@ -35,9 +34,7 @@ export default function Sidebar() {
         ...styles.sidebar,
         width: collapsed ? 0 : 270,
         padding: collapsed ? 0 : "14px 10px",
-
-        // theme background
-        background: isDark ? "var(--card)" : "var(--card)",
+        background: "var(--card)",
       }}
     >
       {!collapsed && (
@@ -46,12 +43,7 @@ export default function Sidebar() {
           <div style={styles.top}>
             <div style={styles.logo}>
               <div style={styles.logoBox} />
-              <div
-                style={{
-                  ...styles.logoText,
-                  color: isDark ? "var(--card)" : "#1e293b",
-                }}
-              >
+              <div style={styles.logoText}>
                 PDF Workspace
               </div>
             </div>
@@ -66,20 +58,25 @@ export default function Sidebar() {
           </div>
 
           {/* HOME */}
-          <SidebarItem to="/" label={i18n[lang].home} icon="🏠" isDark={isDark} />
+          <SidebarItem
+            to="/"
+            label={t(lang, "nav.home")}
+            icon="🏠"
+            isDark={isDark}
+          />
 
           {/* TOOLS */}
           {tools.map((group) => (
             <div key={group.category}>
               <div style={styles.sectionTitleSmall}>
-                {group.category}
+                {t(lang, `categories.${group.category}`)}
               </div>
 
               {group.items.map((item) => (
                 <SidebarItem
                   key={item.path}
                   to={item.path}
-                  label={item.title}
+                  label={t(lang, `tools.${item.title}`)}
                   icon={item.icon}
                   isDark={isDark}
                 />
@@ -89,14 +86,30 @@ export default function Sidebar() {
 
           {/* SYSTEM */}
           <div style={styles.accountSection}>
-            <SidebarItem to="/my-files" label={i18n[lang].myFiles} icon="📁" isDark={isDark} />
-            <SidebarItem to="/profile" label={i18n[lang].profile} icon="👤" isDark={isDark} />
-            <SidebarItem to="/settings" label={i18n[lang].settings} icon="⚙️" isDark={isDark} />
+            <SidebarItem
+              to="/my-files"
+              label={t(lang, "common.myFiles")}
+              icon="📁"
+              isDark={isDark}
+            />
+
+            <SidebarItem
+              to="/profile"
+              label={t(lang, "common.profile")}
+              icon="👤"
+              isDark={isDark}
+            />
+
+            <SidebarItem
+              to="/settings"
+              label={t(lang, "common.settings")}
+              icon="⚙️"
+              isDark={isDark}
+            />
           </div>
         </>
       )}
 
-      {/* EXPAND BUTTON */}
       {collapsed && (
         <button
           onClick={() => setCollapsed(false)}
@@ -118,10 +131,9 @@ function SidebarItem({ to, label, icon, isDark }) {
       style={({ isActive }) => ({
         ...styles.item,
 
-        // 🎯 LIGHT MODE (原本設計)
         color: isDark
           ? isActive
-            ? "var(--card)fff"
+            ? "#fff"
             : "rgba(255,255,255,0.75)"
           : isActive
           ? "#4f46e5"
@@ -137,17 +149,14 @@ function SidebarItem({ to, label, icon, isDark }) {
 
         borderLeft: isDark
           ? isActive
-            ? "3px solid var(--card)fff"
+            ? "3px solid #fff"
             : "3px solid transparent"
           : isActive
           ? "3px solid #4f46e5"
           : "3px solid transparent",
       })}
     >
-      <span style={{ width: 22 }}>
-        {icon}
-      </span>
-
+      <span style={{ width: 22 }}>{icon}</span>
       {label}
     </NavLink>
   );

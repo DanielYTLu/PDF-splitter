@@ -1,43 +1,144 @@
 export const tools = [
   {
-    category: "編輯",
+    category: "edit",
+
     items: [
-      { title: "PDF 分割",icon: "✂️",path: "/split-pdf",description: "快速拆分 PDF 頁面" },
-      { title: "PDF 合併",icon: "🧩",path: "/merge-pdf",description: "合併多個 PDF 檔案"},
-      { title: "PDF 轉 PNG",icon: "🖼️",path: "/pdf-to-png",description: "轉換成圖片格式" },
-      { title: "頁面排序", icon: "🔀", path: "/reorder-pdf" },
-      { title: "PDF 壓縮", icon: "📉", path: "/compress-pdf" },
-      { title: "提取頁面", icon: "📄", path: "/extract-pdf" },
-      { title: "旋轉 PDF", icon: "🔄", path: "/rotate-pdf" },
+      {
+        title: "splitPdf",
+        description: "splitPdfDesc",
+        icon: "✂️",
+        path: "/split-pdf",
+      },
+
+      {
+        title: "mergePdf",
+        description: "mergePdfDesc",
+        icon: "🧩",
+        path: "/merge-pdf",
+      },
+
+      {
+        title: "pdfToPng",
+        description: "pdfToPngDesc",
+        icon: "🖼️",
+        path: "/pdf-to-png",
+      },
+
+      {
+        title: "reorderPdf",
+        description: "reorderPdfDesc",
+        icon: "🔀",
+        path: "/reorder-pdf",
+      },
+
+      {
+        title: "compressPdf",
+        description: "compressPdfDesc",
+        icon: "📉",
+        path: "/compress-pdf",
+      },
+
+      {
+        title: "extractPdf",
+        description: "extractPdfDesc",
+        icon: "📄",
+        path: "/extract-pdf",
+      },
+
+      {
+        title: "rotatePdf",
+        description: "rotatePdfDesc",
+        icon: "🔄",
+        path: "/rotate-pdf",
+      },
     ],
   },
 
   {
-    category: "轉換",
+    category: "convert",
+
     items: [
-      { title: "PDF 轉 PNG", icon: "🖼️", path: "/pdf-to-png" },
-      { title: "圖片轉 PDF", icon: "🧾", path: "/image-to-pdf" },
+      {
+        title: "pdfToPng",
+        description: "pdfToPngDesc",
+        icon: "🖼️",
+        path: "/pdf-to-png",
+      },
+
+      {
+        title: "imageToPdf",
+        description: "imageToPdfDesc",
+        icon: "🧾",
+        path: "/image-to-pdf",
+      },
     ],
   },
 
   {
-    category: "安全",
+    category: "security",
+
     items: [
-      { title: "加密 PDF", icon: "🔒", path: "/encrypt-pdf" },
-      { title: "解鎖 PDF", icon: "🔓", path: "/unlock-pdf" },
+      {
+        title: "encryptPdf",
+        description: "encryptPdfDesc",
+        icon: "🔒",
+        path: "/encrypt-pdf",
+      },
+
+      {
+        title: "unlockPdf",
+        description: "unlockPdfDesc",
+        icon: "🔓",
+        path: "/unlock-pdf",
+      },
     ],
   },
 
   {
-    category: "進階",
+    category: "advanced",
+
     items: [
-      { title: "文字浮水印", icon: "💧", path: "/watermark-pdf" },
-      { title: "圖片浮水印", icon: "🖼️", path: "/logo-watermark-pdf" },
-      { title: "頁碼", icon: "#️⃣", path: "/page-number-pdf" },
-      { title: "頁首頁尾", icon: "📑", path: "/header-footer-pdf" },
-      { title: "Metadata", icon: "🏷️", path: "/metadata-pdf" },
-      { title: "Smart Clean",icon: "🧠",path: "/smart-clean-pdf",}
+      {
+        title: "watermarkPdf",
+        description: "watermarkPdfDesc",
+        icon: "💧",
+        path: "/watermark-pdf",
+      },
+
+      {
+        title: "imageWatermarkPdf",
+        description: "imageWatermarkPdfDesc",
+        icon: "🖼️",
+        path: "/logo-watermark-pdf",
+      },
+
+      {
+        title: "pageNumberPdf",
+        description: "pageNumberPdfDesc",
+        icon: "#️⃣",
+        path: "/page-number-pdf",
+      },
+
+      {
+        title: "headerFooterPdf",
+        description: "headerFooterPdfDesc",
+        icon: "📑",
+        path: "/header-footer-pdf",
+      },
+
+      {
+        title: "metadataPdf",
+        description: "metadataPdfDesc",
+        icon: "🏷️",
+        path: "/metadata-pdf",
+      },
+
+      {
+        title: "smartCleanPdf",
+        description: "smartCleanPdfDesc",
+        icon: "🧠",
+        path: "/smart-clean-pdf",
+      },
     ],
   },
-  
 ];

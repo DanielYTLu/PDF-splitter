@@ -1,97 +1,129 @@
 import { useState } from "react";
-import usePDFTool from "../hooks/usePDFTool";
+
 import FileUploader from "../components/FileUploader";
 import Loading from "../components/Loading";
-import toast from "react-hot-toast";
+import CompressPDFSettings from "../components/CompressPDFSettings";
 
 import { compressPDF } from "../utils/compressPDF";
+import toast from "react-hot-toast";
 
 export default function CompressPDF() {
-  const {
-    file,
-    setFile,
-    loading,
-    setLoading,
-    handleSuccess,
-    handleError,
-  } = usePDFTool();
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const [settings, setSettings] = useState({
+    level: "medium",
+  });
 
   const handleCompress = async () => {
     if (!file) {
-      toast.error("請選擇 PDF");
+      toast.error("Please upload a PDF file");
       return;
     }
 
     try {
       setLoading(true);
 
-      await compressPDF(file);
+      await compressPDF(file, settings);
 
-      handleSuccess("壓縮完成！");
+      toast.success("Compression completed");
     } catch (err) {
-      handleError(err, "壓縮失敗");
+      console.error(err);
+      toast.error("Compression failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      {/* Title */}
-      <h1>
-        🗜 PDF 壓縮
-      </h1>
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Compress PDF</h1>
+        <p style={styles.subtitle}>
+          Reduce file size with adjustable compression levels
+        </p>
+      </div>
 
-      {loading && <Loading text="正在壓縮 PDF..." />}
+      {/* UPLOAD */}
+      <div style={styles.card}>
+        <h3 style={styles.step}>Upload</h3>
+        <FileUploader
+          multiple={false}
+          onFile={(f) => setFile(f)}
+        />
+      </div>
 
-      {!file && (
-        <div
-          style={{
-            background: "white",
-            padding: 20,
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-            marginBottom: 20,
-          }}
-        >
-          <FileUploader
-            onFile={(file) => {
-              setFile(file);
-              toast.success("上傳成功！");
-            }}
-          />
-        </div>
-      )}
+      {/* SETTINGS */}
+      <div style={styles.card}>
+        <h3 style={styles.step}>Compression Settings</h3>
 
+        <CompressPDFSettings
+          settings={settings}
+          setSettings={setSettings}
+        />
+      </div>
+
+      {/* ACTION */}
       {file && (
-        <div
-          style={{
-            background: "white",
-            padding: 20,
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <p style={{ fontWeight: 600 }}>已選擇：{file.name}</p>
-
-          <button
-            onClick={handleCompress}
-            disabled={loading}
-            style={{
-              padding: 12,
-              background: loading ? "#86efac" : "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: 8,
-              width: "100%",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontWeight: 600,
-            }}
-          >
-            {loading ? "處理中..." : "壓縮 PDF"}
+        <div style={styles.action}>
+          <button onClick={handleCompress} style={styles.button}>
+            Compress PDF
           </button>
         </div>
       )}
+
+      {loading && <Loading />}
     </div>
   );
 }
+
+const styles = {
+  page: {
+    padding: 24,
+    maxWidth: 800,
+    margin: "0 auto",
+  },
+
+  header: {
+    marginBottom: 20,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: 700,
+  },
+
+  subtitle: {
+    color: "#64748b",
+    fontSize: 13,
+  },
+
+  card: {
+    background: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    border: "1px solid #eef2f7",
+  },
+
+  step: {
+    fontSize: 13,
+    marginBottom: 10,
+    color: "#0f172a",
+  },
+
+  action: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+
+  button: {
+    padding: "12px 20px",
+    background: "#0ea5e9",
+    color: "white",
+    border: "none",
+    borderRadius: 10,
+    cursor: "pointer",
+  },
+};

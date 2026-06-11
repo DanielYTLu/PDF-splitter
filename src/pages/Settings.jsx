@@ -1,35 +1,42 @@
 import { useUser } from "../context/UserContext";
+import { t } from "../i18n";
 
 export default function Settings() {
   const { user, setUser } = useUser();
-
+  const lang = user.language;
   return (
     <div style={{ maxWidth: 900, margin: "0 auto" }}>
       {/* HEADER */}
       <h1 style={{ fontSize: 32, fontWeight: 800, color: "var(--text)" }}>
-        ⚙️ Settings
+        ⚙️ {t(lang, "settings")}
       </h1>
 
       <p style={{ color: "var(--muted)", marginBottom: 30 }}>
-        Customize your workspace experience
+        {t(lang, "customize")}
       </p>
 
       {/* THEME */}
-      <Section title="Theme">
+      <Section title={t(lang, "theme")}>
         <Select
           value={user.theme}
           onChange={(e) =>
             setUser({ ...user, theme: e.target.value })
           }
-          options={[
-            { label: "Light", value: "light" },
-            { label: "Dark", value: "dark" },
-          ]}
+         options={[
+  {
+    label: t(lang, "light"),
+    value: "light",
+  },
+  {
+    label: t(lang, "dark"),
+    value: "dark",
+  },
+]}
         />
       </Section>
 
       {/* LANGUAGE */}
-      <Section title="Language">
+      <Section title={t(lang, "language")}>
         <Select
           value={user.language}
           onChange={(e) =>
@@ -43,7 +50,7 @@ export default function Settings() {
       </Section>
 
       {/* EXPORT FORMAT */}
-      <Section title="Default Export Format">
+      <Section title={t(lang, "exportFormat")}>
         <Select
           value={user.exportFormat}
           onChange={(e) =>
@@ -57,7 +64,7 @@ export default function Settings() {
       </Section>
 
       {/* AUTO SAVE */}
-      <Section title="Auto Save">
+      <Section title={t(lang, "autoSave")}>
         <label style={{ display: "flex", gap: 10, color: "var(--text)" }}>
           <input
             type="checkbox"
@@ -66,7 +73,7 @@ export default function Settings() {
               setUser({ ...user, autoSave: e.target.checked })
             }
           />
-          Enable Auto Save
+          {t(lang, "enableAutoSave")}
         </label>
       </Section>
     </div>
