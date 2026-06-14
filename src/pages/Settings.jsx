@@ -1,6 +1,19 @@
 import { useUser } from "../context/UserContext";
 import { t } from "../i18n";
 
+const themeOptions = [
+  { label: "Light", value: "light" },
+  { label: "Dark", value: "dark" },
+];
+const languageOptions = [
+  { label: "中文", value: "zh" },
+  { label: "English", value: "en" },
+];
+const exportOptions = [
+  { label: "PDF", value: "pdf" },
+  { label: "PNG", value: "png" },
+];
+
 export default function Settings() {
   const { user, setUser } = useUser();
   const lang = user.language;
@@ -15,6 +28,14 @@ export default function Settings() {
         {t(lang, "customize")}
       </p>
 
+      <Section title="Account Quick Status">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+          <StatusChip label="Email" value={user.email} />
+          <StatusChip label="Plan" value={user.plan} />
+          <StatusChip label="Auto Save" value={user.autoSave ? "Enabled" : "Disabled"} />
+        </div>
+      </Section>
+
       {/* THEME */}
       <Section title={t(lang, "theme")}>
         <Select
@@ -22,16 +43,7 @@ export default function Settings() {
           onChange={(e) =>
             setUser({ ...user, theme: e.target.value })
           }
-         options={[
-  {
-    label: t(lang, "light"),
-    value: "light",
-  },
-  {
-    label: t(lang, "dark"),
-    value: "dark",
-  },
-]}
+          options={themeOptions.map((option) => ({ ...option, label: t(lang, option.value === "light" ? "light" : "dark") }))}
         />
       </Section>
 
@@ -42,10 +54,7 @@ export default function Settings() {
           onChange={(e) =>
             setUser({ ...user, language: e.target.value })
           }
-          options={[
-            { label: "中文", value: "zh" },
-            { label: "English", value: "en" },
-          ]}
+          options={languageOptions}
         />
       </Section>
 
@@ -56,10 +65,7 @@ export default function Settings() {
           onChange={(e) =>
             setUser({ ...user, exportFormat: e.target.value })
           }
-          options={[
-            { label: "PDF", value: "pdf" },
-            { label: "PNG", value: "png" },
-          ]}
+          options={exportOptions}
         />
       </Section>
 
@@ -96,6 +102,15 @@ function Section({ title, children }) {
     >
       <h3 style={{ marginBottom: 12 }}>{title}</h3>
       {children}
+    </div>
+  );
+}
+
+function StatusChip({ label, value }) {
+  return (
+    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 12 }}>
+      <div style={{ color: "var(--muted)", fontSize: 12 }}>{label}</div>
+      <div style={{ color: "var(--text)", fontSize: 15, fontWeight: 700, marginTop: 4 }}>{value}</div>
     </div>
   );
 }

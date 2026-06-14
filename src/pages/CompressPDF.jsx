@@ -94,12 +94,12 @@ const styles = {
   },
 
   subtitle: {
-    color: "#64748b",
+    color: "var(--muted)",
     fontSize: 13,
   },
 
   card: {
-    background: "#fff",
+    background: "var(--card)",
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
@@ -109,7 +109,7 @@ const styles = {
   step: {
     fontSize: 13,
     marginBottom: 10,
-    color: "#0f172a",
+    color: "var(--text)",
   },
 
   action: {

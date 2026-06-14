@@ -15,6 +15,9 @@ export default function SmartCleanPDF() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [minWidth, setMinWidth] = useState(100);
+  const [minHeight, setMinHeight] = useState(100);
+  const [removeBlankOnly, setRemoveBlankOnly] = useState(true);
 
   const handleRun = async () => {
     if (!file) return toast.error("請先上傳 PDF");
@@ -22,7 +25,7 @@ export default function SmartCleanPDF() {
     try {
       setLoading(true);
 
-      const blob = await smartCleanPDF(file);
+      const blob = await smartCleanPDF(file, { minWidth, minHeight, removeBlankOnly });
 
       setResult(blob);
 
@@ -50,6 +53,17 @@ export default function SmartCleanPDF() {
 
         {file && (
           <Card>
+            <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>最小寬度：{minWidth}px</label>
+            <input type="range" min="50" max="300" value={minWidth} onChange={(e) => setMinWidth(Number(e.target.value))} style={{ width: "100%", marginBottom: 10 }} />
+
+            <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>最小高度：{minHeight}px</label>
+            <input type="range" min="50" max="300" value={minHeight} onChange={(e) => setMinHeight(Number(e.target.value))} style={{ width: "100%", marginBottom: 10 }} />
+
+            <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <input type="checkbox" checked={removeBlankOnly} onChange={(e) => setRemoveBlankOnly(e.target.checked)} />
+              只移除空白/過小頁
+            </label>
+
             <button
               onClick={handleRun}
               style={{
@@ -73,7 +87,7 @@ export default function SmartCleanPDF() {
               title="清理完成"
               description="已移除無效頁面"
               onDownload={() =>
-                downloadBlob(result, "smart-clean.pdf")
+                downloadFile(result, "smart-clean.pdf")
               }
             />
           </Card>

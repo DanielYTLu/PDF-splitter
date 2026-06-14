@@ -7,8 +7,16 @@ import {
 export async function headerFooterPDF(
   file,
   header,
-  footer
+  footer,
+  options = {}
 ) {
+  const {
+    headerSize = 12,
+    footerSize = 12,
+    color = [0, 0, 0],
+    opacity = 1,
+    align = "left",
+  } = options;
   const bytes =
     await file.arrayBuffer();
 
@@ -27,23 +35,29 @@ export async function headerFooterPDF(
     const { width, height } =
       page.getSize();
 
+    const textColor = rgb(color[0], color[1], color[2]);
+
     if (header) {
+      const headerX = align === "center" ? width / 2 - font.widthOfTextAtSize(header, headerSize) / 2 : align === "right" ? width - 40 - font.widthOfTextAtSize(header, headerSize) : 40;
       page.drawText(header, {
-        x: 40,
+        x: headerX,
         y: height - 30,
-        size: 12,
+        size: headerSize,
         font,
-        color: rgb(0, 0, 0),
+        color: textColor,
+        opacity,
       });
     }
 
     if (footer) {
+      const footerX = align === "center" ? width / 2 - font.widthOfTextAtSize(footer, footerSize) / 2 : align === "right" ? width - 40 - font.widthOfTextAtSize(footer, footerSize) : 40;
       page.drawText(footer, {
-        x: 40,
+        x: footerX,
         y: 20,
-        size: 12,
+        size: footerSize,
         font,
-        color: rgb(0, 0, 0),
+        color: textColor,
+        opacity,
       });
     }
   });

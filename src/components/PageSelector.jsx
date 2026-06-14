@@ -17,6 +17,9 @@ import SortablePage from "./SortablePage";
 export default function PageSelector({
   orderedPages = [],
   setOrderedPages,
+  selectedPages = [],
+  setSelectedPages,
+  allowDrag = true,
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -43,12 +46,12 @@ export default function PageSelector({
   };
 
   const toggleSelect = (id) => {
-    setOrderedPages((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, selected: !p.selected }
-          : p
-      )
+    if (!setSelectedPages) return;
+
+    setSelectedPages((prev = []) =>
+      prev.includes(id)
+        ? prev.filter((pageId) => pageId !== id)
+        : [...prev, id]
     );
   };
 
@@ -78,8 +81,9 @@ export default function PageSelector({
               thumbnail={page.thumbnail}
               width={page.width}
               height={page.height}
-              selected={page.selected}
-              onSelect={() => toggleSelect(page.id)}
+              selected={selectedPages.includes(page.id)}
+              onSelect={setSelectedPages ? () => toggleSelect(page.id) : undefined}
+              disabled={!allowDrag}
             />
           ))}
         </div>

@@ -7,8 +7,16 @@ import {
 
 export async function watermarkPDF(
   file,
-  text
+  text,
+  options = {}
 ) {
+  const {
+    opacity = 0.35,
+    size = 48,
+    position = "center",
+    rotation = -35,
+    color = [0.65, 0.65, 0.65],
+  } = options;
   const bytes = await file.arrayBuffer();
 
   const pdfDoc =
@@ -21,22 +29,26 @@ export async function watermarkPDF(
 
   const pages = pdfDoc.getPages();
 
+  const positions = {
+    center: { x: 0.5, y: 0.5 },
+    topLeft: { x: 0.12, y: 0.82 },
+    topRight: { x: 0.78, y: 0.82 },
+    bottomLeft: { x: 0.12, y: 0.18 },
+    bottomRight: { x: 0.78, y: 0.18 },
+  };
+
   pages.forEach((page) => {
-    const { width, height } =
-      page.getSize();
+    const { width, height } = page.getSize();
+    const point = positions[position] || positions.center;
 
     page.drawText(text, {
-      x: width / 4,
-      y: height / 2,
-      size: 40,
+      x: width * point.x,
+      y: height * point.y,
+      size,
       font,
-      color: rgb(
-        0.75,
-        0.75,
-        0.75
-      ),
-      opacity: 0.3,
-      rotate: degrees(-45),
+      color: rgb(color[0], color[1], color[2]),
+      opacity,
+      rotate: degrees(rotation),
     });
   });
 

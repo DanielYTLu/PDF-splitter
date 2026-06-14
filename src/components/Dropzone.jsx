@@ -38,6 +38,9 @@ export default function Dropzone({
         ...styles.box,
         ...(isDragging ? styles.dragging : {}),
         ...(isHover && !isDragging ? styles.hover : {}),
+        background: "var(--card)",
+        border: "1px solid var(--border)",
+        color: "var(--text)",
       }}
     >
       <input
@@ -77,8 +80,8 @@ const styles = {
     borderRadius: 16,
     textAlign: "center",
     cursor: "pointer",
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
+    background: "var(--card)",
+    border: "1px solid var(--border)",
     transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
     boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
     position: "relative",
@@ -106,13 +109,13 @@ const styles = {
   title: {
     fontSize: 16,
     fontWeight: 600,
-    color: "#0f172a",
+    color: "var(--text)",
     marginBottom: 6,
     letterSpacing: "-0.01em",
   },
 
   subtitle: {
     fontSize: 12,
-    color: "#64748b",
+    color: "var(--muted)",
   },
 };

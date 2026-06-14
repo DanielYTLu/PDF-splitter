@@ -65,6 +65,13 @@ export default function Profile() {
         </div>
       </div>
 
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 24 }}>
+        <MiniCard label="Status" value={user.isLoggedIn ? "Logged In" : "Guest"} accent="#22c55e" />
+        <MiniCard label="Plan" value={user.plan} accent="#8b5cf6" />
+        <MiniCard label="Language" value={user.language.toUpperCase()} accent="#06b6d4" />
+        <MiniCard label="Export" value={user.exportFormat.toUpperCase()} accent="#f59e0b" />
+      </div>
+
       {/* FORM */}
       <div
         style={{
@@ -92,6 +99,15 @@ export default function Profile() {
           }
         />
       </div>
+    </div>
+  );
+}
+
+function MiniCard({ label, value, accent }) {
+  return (
+    <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 18, padding: 18 }}>
+      <div style={{ color: "var(--muted)", fontSize: 12, textTransform: "uppercase", letterSpacing: 1.2 }}>{label}</div>
+      <div style={{ color: accent, fontSize: 24, fontWeight: 800, marginTop: 6 }}>{value}</div>
     </div>
   );
 }

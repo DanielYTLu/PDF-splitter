@@ -12,6 +12,8 @@ export default function MetadataPDF() {
   const [author, setAuthor] = useState("");
   const [subject, setSubject] = useState("");
   const [keywords, setKeywords] = useState("");
+  const [creator, setCreator] = useState("");
+  const [producer, setProducer] = useState("");
 
   const handleSave = async () => {
     if (!file) {
@@ -27,6 +29,8 @@ export default function MetadataPDF() {
         author,
         subject,
         keywords,
+        creator,
+        producer,
       });
 
       toast.success("Metadata 更新完成！");
@@ -106,6 +110,13 @@ export default function MetadataPDF() {
             onChange={(e) => setKeywords(e.target.value)}
             style={inputStyle}
           />
+          <input placeholder="Creator" value={creator} onChange={(e) => setCreator(e.target.value)} style={inputStyle} />
+          <input placeholder="Producer" value={producer} onChange={(e) => setProducer(e.target.value)} style={inputStyle} />
+
+          <div style={{ marginBottom: 10, padding: 12, borderRadius: 10, background: "#f8fafc", border: "1px solid #e5e7eb" }}>
+            <p style={{ margin: "0 0 6px", fontWeight: 600 }}>預覽摘要</p>
+            <div style={{ color: "#374151", fontSize: 13 }}>Title: {title || "-"}<br />Author: {author || "-"}<br />Subject: {subject || "-"}</div>
+          </div>
 
           <button
             onClick={handleSave}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 import Dropzone from "../components/Dropzone";
 import Card from "../components/ui/Card";
+import ToolPageShell from "../components/ToolPageShell";
 import PageSelector from "../components/PageSelector";
 import LoadingOverlay from "../components/LoadingOverlay";
 
@@ -23,54 +24,68 @@ export default function SplitPDF() {
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [orderedPages, setOrderedPages] = useState([]);
-  // =========================
-  // 📄 PDF page count
-  // =========================
-useEffect(() => {
-  const load = async () => {
-    if (!file) return;
+  const buildThumbnails = async (pageIds) => {
+    const thumbnails = await Promise.all(
+      pageIds.map(async (id) => {
+        const page = await renderPage(file, id, 0.45);
 
-    try {
-      const bytes = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(bytes);
+        return {
+          id,
+          thumbnail: page.src,
+          width: page.width,
+          height: page.height,
+          selected: selectedPages.includes(id),
+        };
+      })
+    );
 
-      const count = pdf.getPageCount();
-
-      setTotalPages(count);
-
-      const selected =
-        Array.from(
-          { length: count },
-          (_, i) => i + 1
-        );
-
-      setSelectedPages(selected);
-
-      const thumbnails = await Promise.all(
-  selected.map(async (id) => {
-    const page = await renderPage(file, id, 0.45);
-
-    return {
-      id,
-      thumbnail: page.src,
-      width: page.width,
-      height: page.height,
-      selected: true,
-    };
-  })
-);
-
-setOrderedPages(thumbnails);
-
-      setOrderedPages(thumbnails);
-    } catch (err) {
-      console.error(err);
-      toast.error("PDF 解析失敗");
-    }
+    return thumbnails;
   };
 
-  load();
-}, [file]);
+  useEffect(() => {
+    const load = async () => {
+      if (!file) return;
+
+      try {
+        const bytes = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(bytes);
+
+        const count = pdf.getPageCount();
+
+        setTotalPages(count);
+        setSelectedPages([]);
+
+        const allPages = Array.from({ length: count }, (_, i) => i + 1);
+        const thumbnails = await buildThumbnails(allPages);
+
+        setOrderedPages(thumbnails);
+      } catch (err) {
+        console.error(err);
+        toast.error("PDF 解析失敗");
+      }
+    };
+
+    load();
+  }, [file]);
+
+  useEffect(() => {
+    if (!file || mode !== "range") return;
+
+    const pages = parsePageRange(rangeInput, totalPages);
+
+    if (!pages.length) {
+      setOrderedPages([]);
+      return;
+    }
+
+    const updateRangePreview = async () => {
+      const thumbnails = await buildThumbnails(pages);
+      setOrderedPages(thumbnails);
+      setSelectedPages(pages);
+    };
+
+    updateRangePreview();
+  }, [file, mode, rangeInput, totalPages]);
 
   // =========================
   // ✂️ split engine
@@ -123,8 +138,12 @@ setOrderedPages(thumbnails);
   };
 
   return (
-    <div style={styles.page}>
-      <h1 style={styles.title}>✂️ Split PDF Pro</h1>
+    <ToolPageShell
+      badge="Split PDF"
+      title="✂️ Split PDF Pro"
+      subtitle="上傳、選擇頁面或範圍，快速拆分並匯出你的 PDF。"
+      meta={<><span style={{ color: "var(--muted)" }}>模式</span><strong style={{ color: "var(--text)" }}>{mode}</strong></>}
+    >
 
       <Card>
         <Dropzone onFile={setFile} />
@@ -166,15 +185,16 @@ setOrderedPages(thumbnails);
         </Card>
       )}
 
-      {file && mode === "select" && (
+      {file && (mode === "select" || mode === "range") && (
         <Card>
           <PageSelector
-  pdfFile={file}
-  orderedPages={orderedPages}
-  setOrderedPages={setOrderedPages}
-  selectedPages={selectedPages}
-  setSelectedPages={setSelectedPages}
-/>
+            pdfFile={file}
+            orderedPages={orderedPages}
+            setOrderedPages={setOrderedPages}
+            selectedPages={selectedPages}
+            setSelectedPages={setSelectedPages}
+            allowDrag={false}
+          />
         </Card>
       )}
 
@@ -189,7 +209,7 @@ setOrderedPages(thumbnails);
       {loading && (
         <LoadingOverlay text="正在處理 PDF..." />
       )}
-    </div>
+    </ToolPageShell>
   );
 }
 
@@ -229,7 +249,7 @@ const styles = {
   },
 
   segmentActive: {
-    background: "#fff",
+    background: "var(--card)",
     color: "#0ea5e9",
     fontWeight: 600,
     boxShadow: "0 6px 15px rgba(0,0,0,0.08)",

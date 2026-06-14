@@ -1,12 +1,19 @@
 import {
   PDFDocument,
+  degrees,
 } from "pdf-lib";
 
 export async function imageWatermarkPDF(
   pdfFile,
   imageFile,
-  opacity = 0.3
+  options = {}
 ) {
+  const {
+    opacity = 0.3,
+    scale = 1,
+    position = "center",
+    rotation = 0,
+  } = options;
   const pdfBytes =
     await pdfFile.arrayBuffer();
 
@@ -32,19 +39,31 @@ export async function imageWatermarkPDF(
       );
   }
 
-  const pages =
-    pdfDoc.getPages();
+  const pages = pdfDoc.getPages();
+  const positions = {
+    center: { x: 0.5, y: 0.5 },
+    topLeft: { x: 0.18, y: 0.82 },
+    topRight: { x: 0.82, y: 0.82 },
+    bottomLeft: { x: 0.18, y: 0.18 },
+    bottomRight: { x: 0.82, y: 0.18 },
+  };
+
+  const baseWidth = image.width;
+  const baseHeight = image.height;
+  const width = baseWidth * scale;
+  const height = baseHeight * scale;
 
   pages.forEach((page) => {
-    const { width, height } =
-      page.getSize();
+    const { width: pageWidth, height: pageHeight } = page.getSize();
+    const point = positions[position] || positions.center;
 
     page.drawImage(image, {
-      x: width / 2 - 100,
-      y: height / 2 - 100,
-      width: 200,
-      height: 200,
+      x: pageWidth * point.x - width / 2,
+      y: pageHeight * point.y - height / 2,
+      width,
+      height,
       opacity,
+      rotate: degrees(rotation),
     });
   });
 

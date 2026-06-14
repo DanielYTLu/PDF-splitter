@@ -4,6 +4,7 @@ import FileCard from "../components/FileCard";
 import FileUploader from "../components/FileUploader";
 import Loading from "../components/Loading";
 import MergePDFSettings from "../components/MergePDFSettings";
+import ToolPageShell from "../components/ToolPageShell";
 
 import toast from "react-hot-toast";
 
@@ -100,14 +101,12 @@ export default function MergePDF() {
   };
 
   return (
-    <div style={styles.page}>
-      {/* HEADER */}
-      <div style={styles.header}>
-        <h1 style={styles.title}>📚 Merge PDF</h1>
-        <p style={styles.subtitle}>
-          上傳 → 排序 → 設定 → 合併輸出
-        </p>
-      </div>
+    <ToolPageShell
+      badge="Merge PDF"
+      title="📚 Merge PDF"
+      subtitle="上傳多個檔案、調整順序與模式，再一鍵輸出成新的 PDF。"
+      meta={<><span style={{ color: "var(--muted)" }}>檔案</span><strong style={{ color: "var(--text)" }}>{files.length} 個</strong></>}
+    >
 
       {/* STEP 1 UPLOAD */}
       <div style={styles.card}>
@@ -181,7 +180,7 @@ export default function MergePDF() {
       )}
 
       {loading && <Loading />}
-    </div>
+    </ToolPageShell>
   );
 }
 
@@ -205,13 +204,13 @@ const styles = {
   },
 
   subtitle: {
-    color: "#64748b",
+    color: "var(--muted)",
     fontSize: 13,
     marginTop: 6,
   },
 
   card: {
-    background: "#fff",
+    background: "var(--card)",
     borderRadius: 14,
     padding: 16,
     marginBottom: 16,
@@ -223,7 +222,7 @@ const styles = {
     fontSize: 13,
     fontWeight: 600,
     marginBottom: 10,
-    color: "#0f172a",
+    color: "var(--text)",
   },
 
   list: {

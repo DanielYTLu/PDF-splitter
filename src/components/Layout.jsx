@@ -11,7 +11,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const menuRef = useRef();
   const notifyRef = useRef();
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const lang = user.language;
 
   // click outside close
@@ -49,32 +49,29 @@ export default function Layout() {
               style={styles.search}
             />
 
-            {/* 🔔 Notification */}
+            {/* � Announcements */}
             <div ref={notifyRef} style={{ position: "relative" }}>
               <button
                 className="top-btn"
                 onClick={() => setOpenNotify(!openNotify)}
+                title="訊息推播區"
               >
-                🔔
+                📣
               </button>
 
               {openNotify && (
                 <div style={styles.dropdown}>
-                  <div style={styles.menuItem}>📄 {t(lang, "pdfDone")}</div>
-                  <div style={styles.menuItem}>🔒 {t(lang, "encrypted")}</div>
-                  <div style={styles.menuItem}>📥 {t(lang, "update")}</div>
+                  <div style={{...styles.menuItem, fontWeight: 700}}>📣 訊息推播區</div>
+                  <div style={styles.menuItem}>✅ 已支援深色模式與工具內暗色表單</div>
+                  <div style={styles.menuItem}>🛠️ 目前可直接從設定頁調整個人偏好</div>
+                  <div style={styles.menuItem}>📁 我的檔案已加入搜尋、下載與管理功能</div>
                 </div>
               )}
             </div>
 
             {/* ⚙️ Settings */}
             <div style={{ position: "relative" }}>
-              <button
-                className="top-btn"
-                onClick={() => alert("Settings coming soon")}
-              >
-                ⚙️
-              </button>
+              <button className="top-btn" onClick={() => navigate("/settings")} title="設定">⚙️</button>
             </div>
 
             {/* 👤 User Menu */}
@@ -94,7 +91,7 @@ export default function Layout() {
 
                   <div style={styles.menuItem}onClick={() => navigate("/my-files")}>📄 {t(lang, "myFiles")}</div>
 
-                  <div style={styles.menuItemDanger}onClick={() => {localStorage.clear();navigate("/");}}>🚪 {t(lang, "logout")}</div>
+                  <div style={styles.menuItemDanger} onClick={() => { logout(); navigate("/login", { replace: true }); }}>🚪 {t(lang, "logout")}</div>
                 </div>
               )}
             </div>

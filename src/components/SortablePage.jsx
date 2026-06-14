@@ -1,13 +1,15 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Check } from "lucide-react";
 
 export default function SortablePage({
   id,
   thumbnail,
-  selected,
-  onSelect,
   width,
   height,
+  selected = false,
+  onSelect,
+  disabled = false,
 }) {
   const {
     attributes,
@@ -16,32 +18,24 @@ export default function SortablePage({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({ id, disabled });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-
-    border: selected
-      ? "2px solid #0ea5e9"
-      : "1px solid #e2e8f0",
-
-    borderRadius: 14,
+    border: selected ? "2px solid #0ea5e9" : "1px solid var(--border)",
+    borderRadius: 18,
     overflow: "hidden",
-    background: "#fff",
-
-    cursor: "pointer",
-
-    opacity: isDragging ? 0.7 : 1,
-
+    background: selected ? "linear-gradient(180deg, rgba(14,165,233,0.14), var(--card))" : "var(--card)",
+    cursor: disabled ? "default" : onSelect ? "pointer" : "grab",
+    opacity: isDragging ? 0.72 : 1,
     boxShadow: selected
-      ? "0 12px 30px rgba(14,165,233,.25)"
-      : "0 4px 12px rgba(0,0,0,.06)",
-
+      ? "0 18px 34px rgba(14,165,233,0.18)"
+      : "0 10px 24px rgba(15, 23, 42, 0.08)",
     position: "relative",
-
-    // ⭐ 關鍵：依 PDF 比例
     aspectRatio: `${width || 3} / ${height || 4}`,
+    userSelect: "none",
+    touchAction: disabled ? "auto" : "none",
   };
 
   return (
@@ -56,28 +50,34 @@ export default function SortablePage({
       }}
     >
       <img
-  src={thumbnail}
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    background: "#f8fafc",
-  }}
-/>
+        src={thumbnail}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          background: "linear-gradient(135deg, rgba(148,163,184,0.12), rgba(124,58,237,0.12))",
+          display: "block",
+        }}
+      />
 
       <div
         style={{
           position: "absolute",
-          bottom: 6,
-          left: 6,
+          top: 8,
+          left: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
           fontSize: 11,
-          background: "rgba(0,0,0,0.6)",
+          background: "rgba(15, 23, 42, 0.72)",
           color: "#fff",
-          padding: "2px 6px",
-          borderRadius: 6,
+          padding: "4px 7px",
+          borderRadius: 999,
+          backdropFilter: "blur(6px)",
         }}
       >
-        {id}
+        <GripVertical size={12} />
+        第 {id} 頁
       </div>
 
       {selected && (
@@ -89,16 +89,15 @@ export default function SortablePage({
             width: 26,
             height: 26,
             borderRadius: 999,
-            background: "#0ea5e9",
+            background: "linear-gradient(135deg, #0ea5e9 0%, #7c3aed 100%)",
             color: "#fff",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontWeight: 700,
-            fontSize: 14,
+            boxShadow: "0 8px 18px rgba(14, 165, 233, 0.35)",
           }}
         >
-          ✓
+          <Check size={14} />
         </div>
       )}
     </div>

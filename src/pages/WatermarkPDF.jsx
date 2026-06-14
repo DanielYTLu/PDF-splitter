@@ -6,7 +6,11 @@ import toast from "react-hot-toast";
 
 export default function WatermarkPDF() {
   const [file, setFile] = useState(null);
-  const [text, setText] = useState("");
+  const [text, setText] = useState("CONFIDENTIAL");
+  const [size, setSize] = useState(52);
+  const [opacity, setOpacity] = useState(0.35);
+  const [position, setPosition] = useState("center");
+  const [rotation, setRotation] = useState(-35);
   const [loading, setLoading] = useState(false);
 
   const handleWatermark = async () => {
@@ -15,7 +19,12 @@ export default function WatermarkPDF() {
 
     try {
       setLoading(true);
-      await watermarkPDF(file, text);
+      await watermarkPDF(file, text, {
+        size,
+        opacity,
+        position,
+        rotation,
+      });
       toast.success("浮水印完成！");
     } catch (err) {
       console.error(err);
@@ -69,7 +78,7 @@ export default function WatermarkPDF() {
           {/* File Name */}
           <p style={{ fontWeight: 600 }}>{file.name}</p>
 
-          {/* Input */}
+          <label style={{ display: "block", fontWeight: 600, marginTop: 10 }}>浮水印文字</label>
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -79,9 +88,48 @@ export default function WatermarkPDF() {
               padding: 12,
               border: "1px solid #ddd",
               borderRadius: 8,
-              marginTop: 10,
+              marginTop: 6,
             }}
           />
+
+          <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
+            <label style={{ fontWeight: 600 }}>字體大小：{size}px</label>
+            <input type="range" min="18" max="120" value={size} onChange={(e) => setSize(Number(e.target.value))} />
+
+            <label style={{ fontWeight: 600 }}>透明度：{opacity.toFixed(2)}</label>
+            <input type="range" min="0.05" max="1" step="0.01" value={opacity} onChange={(e) => setOpacity(Number(e.target.value))} />
+
+            <label style={{ fontWeight: 600 }}>角度：{rotation}°</label>
+            <input type="range" min="-90" max="90" value={rotation} onChange={(e) => setRotation(Number(e.target.value))} />
+
+            <label style={{ fontWeight: 600 }}>位置</label>
+            <select value={position} onChange={(e) => setPosition(e.target.value)} style={{ padding: 10, borderRadius: 8, border: "1px solid #ddd" }}>
+              <option value="center">中央</option>
+              <option value="topLeft">左上</option>
+              <option value="topRight">右上</option>
+              <option value="bottomLeft">左下</option>
+              <option value="bottomRight">右下</option>
+            </select>
+          </div>
+
+          <div style={{ marginTop: 16, padding: 14, borderRadius: 12, background: "linear-gradient(135deg, #f8fafc, #eef2ff)", border: "1px dashed #c7d2fe" }}>
+            <p style={{ margin: "0 0 8px", fontWeight: 600 }}>預覽縮圖（僅供預覽）</p>
+            <div style={{ minHeight: 110, borderRadius: 12, background: "linear-gradient(135deg, #ffffff, #e5eefb)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", border: "1px solid #dbe4ff" }}>
+              <span
+                style={{
+                  fontSize: size * 0.55,
+                  color: "rgba(107, 114, 128, 0.75)",
+                  transform: `rotate(${rotation}deg)`,
+                  opacity,
+                  letterSpacing: 2,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                }}
+              >
+                {text || "PREVIEW"}
+              </span>
+            </div>
+          </div>
         </div>
       )}
 

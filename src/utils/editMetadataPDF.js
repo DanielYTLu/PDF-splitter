@@ -29,7 +29,14 @@ export async function editMetadataPDF(
       metadata.keywords
         .split(",")
         .map((k) => k.trim())
+        .filter(Boolean)
     );
+
+  if (metadata.creator)
+    pdfDoc.setCreator(metadata.creator);
+
+  if (metadata.producer)
+    pdfDoc.setProducer(metadata.producer);
 
   const pdfBytes =
     await pdfDoc.save();

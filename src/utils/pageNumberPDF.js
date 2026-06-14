@@ -6,8 +6,17 @@ import {
 
 export async function pageNumberPDF(
   file,
-  position = "right"
+  options = {}
 ) {
+  const {
+    position = "bottomRight",
+    size = 12,
+    color = [0, 0, 0],
+    startAt = 1,
+    prefix = "",
+    suffix = "",
+    vertical = "bottom",
+  } = options;
   const bytes = await file.arrayBuffer();
 
   const pdfDoc =
@@ -21,26 +30,27 @@ export async function pageNumberPDF(
   const pages = pdfDoc.getPages();
 
   pages.forEach((page, index) => {
-    const { width } = page.getSize();
+    const { width, height } = page.getSize();
 
+    const text = `${prefix}${index + startAt}${suffix}`;
     let x = width - 50;
+    let y = 20;
 
-    if (position === "center")
-      x = width / 2;
+    if (position === "center" || position === "bottomCenter") x = width / 2;
+    if (position === "left" || position === "bottomLeft") x = 30;
+    if (position === "topLeft") x = 30;
+    if (position === "topCenter") x = width / 2;
+    if (position === "topRight") x = width - 50;
 
-    if (position === "left")
-      x = 30;
+    if (vertical === "top" || position.startsWith("top")) y = height - 20;
 
-    page.drawText(
-      `${index + 1}`,
-      {
-        x,
-        y: 20,
-        size: 12,
-        font,
-        color: rgb(0, 0, 0),
-      }
-    );
+    page.drawText(text, {
+      x,
+      y,
+      size,
+      font,
+      color: rgb(color[0], color[1], color[2]),
+    });
   });
 
   const pdfBytes =

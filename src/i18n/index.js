@@ -26,6 +26,9 @@ export const i18n = {
       customize: "自訂你的工作區體驗",
 
       logout: "登出",
+      myFiles: "我的檔案",
+      profile: "個人資料",
+      settings: "設定",
 
       searchResults: "搜尋結果",
       quickActions: "快速工具",
@@ -89,9 +92,6 @@ export const i18n = {
 
       metadataPdfDesc: "編輯 PDF Metadata",
       smartCleanPdfDesc: "智慧清理 PDF 文件",
-       myFiles: "我的檔案",
-  profile: "個人資料",
-  settings: "設定",
     },
   },
 
@@ -122,6 +122,9 @@ export const i18n = {
       customize: "Customize your workspace experience",
 
       logout: "Logout",
+      myFiles: "My Files",
+      profile: "Profile",
+      settings: "Settings",
 
       searchResults: "Search Results",
       quickActions: "Quick Actions",
@@ -185,10 +188,6 @@ export const i18n = {
 
       metadataPdfDesc: "Edit PDF metadata",
       smartCleanPdfDesc: "Clean PDF intelligently",
-
-        myFiles: "My Files",
-  profile: "Profile",
-  settings: "Settings",
     },
   },
 };

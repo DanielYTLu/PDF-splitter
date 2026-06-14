@@ -4,12 +4,13 @@ export default function Card({ children }) {
   return (
     <div
       style={{
-        background: "white",
+        background: "var(--card)",
         borderRadius: radius.lg,
         padding: 16,
-        boxShadow: shadow.sm,
-        border: `1px solid ${colors.gray200}`,
+        boxShadow: "var(--card-shadow)",
+        border: "1px solid var(--border)",
         transition: "0.2s",
+        color: "var(--text)",
       }}
     >
       {children}

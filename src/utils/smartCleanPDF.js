@@ -5,7 +5,12 @@ import { PDFDocument } from "pdf-lib";
  * - 移除空白頁
  * - 保留有內容頁
  */
-export async function smartCleanPDF(file) {
+export async function smartCleanPDF(file, options = {}) {
+  const {
+    minWidth = 100,
+    minHeight = 100,
+    removeBlankOnly = true,
+  } = options;
   const arrayBuffer = await file.arrayBuffer();
   const pdfDoc = await PDFDocument.load(arrayBuffer);
 
@@ -21,7 +26,7 @@ export async function smartCleanPDF(file) {
     const isLikelyEmpty =
       width === 0 ||
       height === 0 ||
-      (width < 100 && height < 100);
+      (removeBlankOnly && (width < minWidth || height < minHeight));
 
     if (!isLikelyEmpty) {
       const [copiedPage] = await newPdf.copyPages(

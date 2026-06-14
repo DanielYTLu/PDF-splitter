@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Layout from "./components/Layout";
 
@@ -23,11 +23,19 @@ import SmartCleanPDF from "./pages/SmartCleanPDF";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import MyFiles from "./pages/MyFiles";
+import Login from "./pages/Login";
+import { useUser } from "./context/UserContext";
+
+function ProtectedRoute({ children }) {
+  const { user } = useUser();
+  return user.isLoggedIn ? children : <Navigate to="/login" replace />;
+}
 
 function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route path="/login" element={<Login />} />
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/" element={<Home />} />
         <Route path="/split-pdf" element={<SplitPDF />} />
         <Route path="/merge-pdf" element={<MergePDF />} />

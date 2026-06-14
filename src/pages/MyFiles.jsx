@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   getFiles,
@@ -10,10 +10,17 @@ import {
 
 export default function MyFiles() {
   const [files, setFiles] = useState([]);
+  const [query, setQuery] = useState("");
 
   const loadFiles = () => {
     setFiles(getFiles());
   };
+
+  const filteredFiles = useMemo(() => {
+    const keyword = query.trim().toLowerCase();
+    if (!keyword) return files;
+    return files.filter((file) => [file.name, file.tool, file.createdAt].join(" ").toLowerCase().includes(keyword));
+  }, [files, query]);
 
   useEffect(() => {
     loadFiles();
@@ -59,16 +66,17 @@ export default function MyFiles() {
             📄 My Files
           </h1>
 
-          <p
-            style={{
-              color: "var(--muted)",
-            }}
-          >
-            Manage your processed files.
-          </p>
+          <p style={{ color: "var(--muted)" }}>Manage your processed files.</p>
         </div>
 
-        <button
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="搜尋檔名 / 工具 / 日期"
+            style={{ height: 42, borderRadius: 10, border: "1px solid var(--border)", background: "var(--card)", color: "var(--text)", padding: "0 12px", minWidth: 220 }}
+          />
+          <button
           onClick={() => {
             if (
               window.confirm(
@@ -82,7 +90,8 @@ export default function MyFiles() {
           style={styles.clearBtn}
         >
           清空紀錄
-        </button>
+          </button>
+        </div>
       </div>
 
       {/* STATS */}
@@ -105,7 +114,7 @@ export default function MyFiles() {
 
         <StatCard
           title="Storage"
-          value="0 MB"
+          value={`${files.reduce((sum, file) => sum + (Number(file.size) || 0), 0)} KB`}
           icon="💾"
         />
 
@@ -123,11 +132,11 @@ export default function MyFiles() {
       </div>
 
       {/* FILE LIST */}
-      {files.length === 0 ? (
+      {filteredFiles.length === 0 ? (
         <EmptyState />
       ) : (
         <div style={styles.grid}>
-          {files.map((file) => (
+          {filteredFiles.map((file) => (
             <div
               key={file.id}
               style={styles.card}
@@ -142,15 +151,9 @@ export default function MyFiles() {
 
               <h3>{file.name}</h3>
 
-              <p>
-                Tool: {file.tool}
-              </p>
-
-              <p>
-                {new Date(
-                  file.createdAt
-                ).toLocaleString()}
-              </p>
+              <p>Tool: {file.tool}</p>
+              <p>Size: {file.size || "Unknown"}</p>
+              <p>{new Date(file.createdAt).toLocaleString()}</p>
 
               <div
                 style={{
@@ -184,9 +187,22 @@ export default function MyFiles() {
 
                 <button
                   onClick={() => {
-                    deleteFile(
-                      file.id
-                    );
+                    const url = file.blob ? URL.createObjectURL(file.blob) : null;
+                    if (url) {
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = file.name || "download.pdf";
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }
+                  }}
+                >
+                  ⬇️
+                </button>
+
+                <button
+                  onClick={() => {
+                    deleteFile(file.id);
                     loadFiles();
                   }}
                 >

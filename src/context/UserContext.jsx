@@ -1,27 +1,33 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const UserContext = createContext();
+const DEFAULT_USER = {
+  name: "Guest User",
+  email: "guest@pdfworkspace.com",
+  plan: "Free",
+  avatar: "👤",
+  theme: "light",
+  language: "zh",
+  exportFormat: "pdf",
+  autoSave: true,
+  isLoggedIn: false,
+};
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState({
-    name: "Guest User",
-    email: "guest@pdfworkspace.com",
-    plan: "Free",
-    avatar: "👤",
+  const [user, setUser] = useState(DEFAULT_USER);
 
-    theme: "light",
-    language: "zh",
-    exportFormat: "pdf",
-    autoSave: true,
-  });
-
-  // ✅ load localStorage
   useEffect(() => {
     const saved = localStorage.getItem("userProfile");
-    if (saved) setUser(JSON.parse(saved));
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setUser({ ...DEFAULT_USER, ...parsed, isLoggedIn: Boolean(parsed.isLoggedIn || parsed.email) });
+      } catch {
+        localStorage.removeItem("userProfile");
+      }
+    }
   }, []);
 
-  // ✅ save localStorage
   useEffect(() => {
     localStorage.setItem("userProfile", JSON.stringify(user));
   }, [user]);
@@ -31,11 +37,18 @@ export function UserProvider({ children }) {
     document.body.setAttribute("data-theme", user.theme);
   }, [user.theme]);
 
-  return (
-    <UserContext.Provider value={{ user, setUser }}>
-      {children}
-    </UserContext.Provider>
-  );
+  const login = (profile) => {
+    setUser({ ...DEFAULT_USER, ...profile, isLoggedIn: true });
+  };
+
+  const logout = () => {
+    setUser({ ...DEFAULT_USER, isLoggedIn: false });
+    localStorage.removeItem("userProfile");
+  };
+
+  const value = useMemo(() => ({ user, setUser, login, logout }), [user]);
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {

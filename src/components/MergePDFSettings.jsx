@@ -33,7 +33,7 @@ export default function MergePDFSettings({
           }
           style={{
             ...styles.option,
-            color: !isReverse ? "#0f172a" : "#64748b",
+            color: !isReverse ? "var(--text)" : "var(--muted)",
           }}
         >
           ➡️ 順序
@@ -46,7 +46,7 @@ export default function MergePDFSettings({
           }
           style={{
             ...styles.option,
-            color: isReverse ? "#0f172a" : "#64748b",
+            color: isReverse ? "var(--text)" : "var(--muted)",
           }}
         >
           ⬅️ 逆序
@@ -74,21 +74,21 @@ const styles = {
   title: {
     fontSize: 13,
     fontWeight: 600,
-    color: "#0f172a",
+    color: "var(--text)",
   },
 
   desc: {
     fontSize: 12,
-    color: "#94a3b8",
+    color: "var(--muted)",
   },
 
   segment: {
     position: "relative",
     display: "flex",
-    background: "#f1f5f9",
+    background: "var(--surface)",
     borderRadius: 14,
     padding: 4,
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--border)",
     overflow: "hidden",
   },
 
@@ -98,7 +98,7 @@ const styles = {
     left: 4,
     width: "calc(50% - 4px)",
     height: "calc(100% - 8px)",
-    background: "#ffffff",
+    background: "var(--card)",
     borderRadius: 12,
     boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
     transition: "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
